@@ -1,14 +1,48 @@
 # Antarikfox Studio
 
-**A visual dashboard card builder for Home Assistant · by Antarikfox**
+**Your home. Your cards. Your style. · by Antarikfox**
 
-Build glass cards with live textures, three-color lighting, state-dependent photos,
-animations, entity controls and nested layouts. Includes Antarikfox Glass Card 3.8.0,
-the Studio editor and an optional theme collection. Russian, English, Chinese and Japanese UI.
+Turn a familiar Home Assistant dashboard into your own glass control panel.
+Combine translucent surfaces, three-color edge lighting, animated textures and
+photos that change with your devices — then arrange the controls in the visual Studio.
 
-![Antarikfox Studio feature overview](https://raw.githubusercontent.com/Antarikfox/Antarikfox-HA-card-Studio/main/docs/overview.png)
+![Dashboard concept: lights, climate, music, network and sensors in colorful glass cards](docs/dashboard-concept.jpg)
 
-The image is a feature illustration, not a Home Assistant screenshot.
+*Illustrative dashboard concept. This is generated artwork, not a screenshot or a
+ready-to-import dashboard; exact appearance depends on your card settings.*
+
+**Свет, климат, музыка и датчики — в твоём оформлении.** Собирай карточки в визуальном
+редакторе: настраивай стекло, цветные края, текстуры, фотографии и действия.
+Предпросмотр помогает подобрать оформление перед сохранением в Home Assistant.
+
+Includes **Antarikfox Glass Card 3.8.0**, the **Studio editor**, and an optional theme
+collection. Interface languages: **Русский · English · 中文 · 日本語**.
+
+[Install with HACS](#install-with-hacs) · [First card](#first-card) ·
+[Русское руководство](docs/GUIDE-RU.md)
+
+## Make every card your own
+
+| Layer | What you can customize |
+| --- | --- |
+| Glass & light | Transparency, blur, three-color lighting and 12 color presets |
+| Surface | Frost, carbon, hexagons, circuits and animated textures |
+| Content | Buttons, sliders, photos, cameras, graphs, media controls and nested groups |
+| Device states | Entity values, visibility rules and state-dependent photos |
+| Interaction | Tap actions and controls for your Home Assistant entities |
+| Workflow | Visual editing, YAML import/export, local backups and storage dashboard saves |
+
+Use warm amber for lighting, cool cyan for network sensors, purple for climate,
+or choose your own palette for each card.
+
+<details>
+<summary>Studio feature overview</summary>
+
+![Antarikfox Studio feature overview](docs/overview.png)
+
+*Feature illustration, not a Home Assistant screenshot.*
+
+</details>
 
 ## Install with HACS
 
