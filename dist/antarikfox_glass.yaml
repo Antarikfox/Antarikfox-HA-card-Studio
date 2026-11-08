@@ -1,0 +1,414 @@
+# ─────────────────────────────────────────────────────────────
+#  ANTARIKFOX GLASS 3.1 — тема Home Assistant (к карточке v3.1.0)
+#
+#  Antarikfox Glass          — автоматически: тёмная/светлая по настройке профиля
+#  Antarikfox Glass Dark     — всегда тёмная (как концепт)
+#  Antarikfox Glass Daylight — всегда светлая (только для светлых обоев!)
+#  … Ember / Ice / Cyber / Matrix / New Year — цветовые варианты
+#
+#  ШРИФТ И РАЗМЕР ДЛЯ ВСЕЙ ТЕМЫ — см. блок «Типографика» ниже.
+# ─────────────────────────────────────────────────────────────
+
+Antarikfox Glass Dark: &afx_glass
+  # ── Значения по умолчанию для antarikfox-glass-card ──
+  afx-theme-tl: "#38bdf8"
+  afx-theme-mid: "#818cf8"
+  afx-theme-br: "#c084fc"
+  afx-theme-glow: "1"
+  afx-theme-spread: "14px"
+  afx-theme-edge: "1.5px"
+  afx-theme-angle: "135deg"
+  afx-theme-alpha: ".28"
+  afx-theme-tint: "#0b1226"
+  afx-theme-blur: "18px"
+  afx-theme-saturate: "160%"
+  afx-theme-glare: ".55"
+  afx-theme-glare-angle: "115deg"
+  afx-theme-radius: "22px"
+  afx-theme-radius-compact: "16px"   # плитки, кнопки и другие низкие карточки
+  afx-theme-inner: ".55"
+  afx-theme-heading-glow: "0 0 18px rgba(129, 140, 248, .55)"
+  afx-theme-text-shadow: "0 1px 2px rgba(0, 0, 0, .35)"
+  afx-theme-glare-tint: "45%"        # насколько блик окрашен цветами свечения (0% — белый)
+  afx-theme-autofix: "on"            # заголовки без рамки, узкие карточки со скруглением по высоте
+
+  # ── Типографика: шрифт и размер для всей темы ──
+  # Имя любого шрифта Google Fonts. Карточка Antarikfox сама подгрузит его.
+  # Без интернета укажите локальный CSS: afx-theme-font-url: "/local/fonts/onest.css"
+  afx-theme-font: "Onest"
+  ha-font-family-body: "Onest, Roboto, Noto, sans-serif"
+  ha-font-family-heading: "Onest, Roboto, Noto, sans-serif"
+  primary-font-family: "Onest, Roboto, Noto, sans-serif"
+  paper-font-common-base_-_font-family: "Onest, Roboto, Noto, sans-serif"
+  mdc-typography-font-family: "Onest, Roboto, Noto, sans-serif"
+  # Масштаб всех шрифтов интерфейса (HA 2025.5+): 1 — обычный, 1.15 — крупнее
+  ha-font-size-scale: "1"
+
+  # ── Палитра ──
+  primary-color: "#7dd3fc"
+  accent-color: "#c084fc"
+  rgb-primary-color: "125, 211, 252"
+  rgb-accent-color: "192, 132, 252"
+  primary-background-color: "#04060d"
+  secondary-background-color: "#0a0f1f"
+  primary-text-color: "#eaf2ff"
+  secondary-text-color: "rgba(200, 215, 255, 0.66)"
+  text-primary-color: "#ffffff"
+  disabled-text-color: "rgba(200, 215, 255, 0.34)"
+  divider-color: "rgba(160, 190, 255, 0.12)"
+
+  # ── Контрастный текст для новых элементов HA 2025+ (плашки, зоны, заголовки, поля) ──
+  ha-color-text-primary: "#eaf2ff"
+  ha-color-text-secondary: "rgba(210, 222, 255, 0.74)"
+  ha-color-text-disabled: "rgba(200, 215, 255, 0.4)"
+  ha-color-text-link: "#7dd3fc"
+  ha-color-form-background: "rgba(255, 255, 255, 0.06)"
+  ha-color-form-background-hover: "rgba(255, 255, 255, 0.1)"
+  ha-color-on-neutral-quiet: "#eaf2ff"
+  ha-color-on-neutral-normal: "#eaf2ff"
+  ha-color-fill-neutral-quiet-resting: "rgba(255, 255, 255, 0.06)"
+  ha-color-fill-neutral-normal-resting: "rgba(255, 255, 255, 0.1)"
+  ha-color-border-neutral-quiet: "rgba(170, 200, 255, 0.18)"
+  ha-color-border-neutral-normal: "rgba(170, 200, 255, 0.3)"
+  ha-heading-card-title-color: "#eaf2ff"
+  ha-heading-card-subtitle-color: "rgba(210, 222, 255, 0.74)"
+  ha-card-header-color: "#eaf2ff"
+  rgb-primary-text-color: "234, 242, 255"
+  rgb-text-primary-color: "255, 255, 255"
+  text-light-primary-color: "#eaf2ff"
+  mdc-theme-on-primary: "#04121c"
+  mdc-theme-on-secondary: "#0b0716"
+  mdc-theme-on-surface: "#eaf2ff"
+  mdc-theme-text-primary-on-background: "#eaf2ff"
+  mdc-theme-text-secondary-on-background: "rgba(210, 222, 255, 0.74)"
+  mdc-theme-text-hint-on-background: "rgba(210, 222, 255, 0.5)"
+  mdc-theme-text-icon-on-background: "rgba(210, 222, 255, 0.74)"
+  mdc-theme-text-disabled-on-background: "rgba(210, 222, 255, 0.4)"
+  mdc-text-field-fill-color: "rgba(255, 255, 255, 0.06)"
+  mdc-text-field-ink-color: "#eaf2ff"
+  mdc-text-field-label-ink-color: "rgba(210, 222, 255, 0.74)"
+  mdc-text-field-idle-line-color: "rgba(170, 200, 255, 0.3)"
+  mdc-text-field-hover-line-color: "rgba(170, 200, 255, 0.6)"
+  mdc-text-field-outlined-idle-border-color: "rgba(170, 200, 255, 0.3)"
+  mdc-text-field-outlined-hover-border-color: "rgba(170, 200, 255, 0.6)"
+  mdc-text-field-disabled-fill-color: "rgba(255, 255, 255, 0.03)"
+  mdc-text-field-disabled-ink-color: "rgba(210, 222, 255, 0.4)"
+  mdc-select-fill-color: "rgba(255, 255, 255, 0.06)"
+  mdc-select-ink-color: "#eaf2ff"
+  mdc-select-label-ink-color: "rgba(210, 222, 255, 0.74)"
+  mdc-select-idle-line-color: "rgba(170, 200, 255, 0.3)"
+  mdc-select-hover-line-color: "rgba(170, 200, 255, 0.6)"
+  mdc-select-dropdown-icon-color: "rgba(210, 222, 255, 0.74)"
+  mdc-select-disabled-fill-color: "rgba(255, 255, 255, 0.03)"
+  mdc-select-disabled-ink-color: "rgba(210, 222, 255, 0.4)"
+  mdc-checkbox-unchecked-color: "rgba(210, 222, 255, 0.6)"
+  mdc-radio-unchecked-color: "rgba(210, 222, 255, 0.6)"
+  mdc-button-outline-color: "rgba(170, 200, 255, 0.3)"
+  mdc-dialog-heading-ink-color: "#eaf2ff"
+  mdc-dialog-content-ink-color: "rgba(210, 222, 255, 0.82)"
+  paper-item-icon-color: "#8aa8ff"
+  paper-item-icon-active-color: "#7dd3fc"
+  paper-listbox-background-color: "#0c1328"
+  paper-dialog-background-color: "#0c1328"
+  paper-card-background-color: "rgba(12, 18, 38, 0.6)"
+  chip-background-color: "rgba(255, 255, 255, 0.08)"
+  table-row-background-color: "rgba(255, 255, 255, 0.02)"
+  table-row-alternative-background-color: "rgba(255, 255, 255, 0.04)"
+  data-table-background-color: "transparent"
+
+  lovelace-background: >-
+    radial-gradient(900px 600px at 12% -8%, rgba(37, 99, 235, 0.38), transparent 62%),
+    radial-gradient(700px 520px at 105% 18%, rgba(124, 58, 237, 0.30), transparent 60%),
+    radial-gradient(800px 600px at 45% 118%, rgba(6, 182, 212, 0.22), transparent 62%),
+    repeating-linear-gradient(90deg, rgba(56, 120, 255, 0.035) 0 2px, transparent 2px 120px),
+    #04060d fixed
+
+  # ── Стекло для всех карточек (работает без card-mod) ──
+  card-background-color: "rgba(12, 18, 38, 0.6)"
+  ha-card-background: "color-mix(in srgb, var(--afx-theme-tint) 34%, transparent)"
+  ha-card-backdrop-filter: "blur(var(--afx-theme-blur)) saturate(var(--afx-theme-saturate))"
+  ha-card-border-radius: "var(--afx-theme-radius)"
+  ha-card-border-width: "1px"
+  ha-card-border-color: "rgba(170, 200, 255, 0.18)"
+  ha-card-box-shadow: >-
+    -7px -7px 22px -12px color-mix(in srgb, var(--afx-theme-tl) 85%, transparent),
+    0 0 20px -8px color-mix(in srgb, var(--afx-theme-mid) 55%, transparent),
+    7px 7px 22px -12px color-mix(in srgb, var(--afx-theme-br) 85%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+    inset 0 -30px 50px -40px rgba(0, 0, 0, 0.7)
+
+  app-header-background-color: "rgba(5, 8, 18, 0.55)"
+  app-header-text-color: "#eaf2ff"
+  app-header-border-bottom: "1px solid rgba(160, 190, 255, 0.12)"
+  sidebar-background-color: "rgba(6, 10, 22, 0.62)"
+  sidebar-text-color: "rgba(220, 230, 255, 0.8)"
+  sidebar-icon-color: "rgba(180, 200, 255, 0.6)"
+  sidebar-selected-icon-color: "#7dd3fc"
+  sidebar-selected-text-color: "#eaf2ff"
+  sidebar-menu-button-background-color: "transparent"
+
+  state-icon-color: "#8aa8ff"
+  state-icon-active-color: "#7dd3fc"
+  state-active-color: "#7dd3fc"
+  state-inactive-color: "rgba(160, 180, 220, 0.45)"
+  state-light-active-color: "#ffc46b"
+  state-climate-heat-color: "#ff6a3d"
+  state-climate-cool-color: "#38bdf8"
+
+  switch-checked-color: "#7dd3fc"
+  switch-checked-button-color: "#e0f2fe"
+  switch-checked-track-color: "#818cf8"
+  switch-unchecked-button-color: "#94a3b8"
+  switch-unchecked-track-color: "rgba(148, 163, 184, 0.35)"
+  mdc-theme-primary: "#7dd3fc"
+  mdc-theme-secondary: "#c084fc"
+  mdc-theme-surface: "#0c1328"
+  input-fill-color: "rgba(255, 255, 255, 0.04)"
+  input-ink-color: "#eaf2ff"
+  input-label-ink-color: "rgba(200, 215, 255, 0.62)"
+  input-idle-line-color: "rgba(160, 190, 255, 0.25)"
+
+  ha-dialog-border-radius: "24px"
+  ha-dialog-surface-background: "rgba(10, 15, 32, 0.8)"
+  mdc-dialog-scrim-color: "rgba(2, 4, 10, 0.55)"
+  dialog-backdrop-filter: "blur(14px) saturate(140%)"
+  code-editor-background-color: "rgba(4, 6, 14, 0.7)"
+  markdown-code-background-color: "rgba(255, 255, 255, 0.05)"
+
+  # ── ОПЦИОНАЛЬНО (нужен card-mod): кант, блик и исправление узких карточек ──
+  card-mod-theme: "Antarikfox Glass Dark"
+  card-mod-card: |
+    ha-card { position: relative; isolation: isolate; text-shadow: var(--afx-theme-text-shadow); }
+    ha-card::before {
+      content: ""; position: absolute; inset: 0; border-radius: inherit;
+      padding: var(--afx-theme-edge, 1.5px); pointer-events: none; z-index: 1;
+      background:
+        linear-gradient(var(--afx-theme-angle, 135deg), rgba(255,255,255,.55), transparent 28%),
+        linear-gradient(var(--afx-theme-angle, 135deg), var(--afx-theme-tl), var(--afx-theme-mid) 50%, var(--afx-theme-br));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: calc(1 - var(--afx-cm-off, 0));
+    }
+    ha-card::after {
+      content: ""; position: absolute; inset: 0; border-radius: inherit;
+      pointer-events: none; z-index: 1; mix-blend-mode: screen;
+      background:
+        radial-gradient(130% 90% at 0% 0%, color-mix(in srgb, color-mix(in srgb, var(--afx-theme-tl) var(--afx-theme-glare-tint, 45%), #fff) 30%, transparent), transparent 50%),
+        radial-gradient(90% 70% at 100% 100%, color-mix(in srgb, color-mix(in srgb, var(--afx-theme-br) var(--afx-theme-glare-tint, 45%), #fff) 14%, transparent), transparent 60%),
+        linear-gradient(var(--afx-theme-glare-angle, 115deg), transparent 34%, color-mix(in srgb, color-mix(in srgb, var(--afx-theme-mid) var(--afx-theme-glare-tint, 45%), #fff) 18%, transparent) 45%, transparent 58%);
+      opacity: calc(var(--afx-theme-glare, .55) * (1 - var(--afx-cm-off, 0)));
+    }
+    /* Заголовки и разделители — без стекла и рамки: текст больше не упирается в скругление */
+    ha-card.type-heading, ha-card.type-custom-mushroom-title-card, ha-card.type-custom-bubble-card,
+    ha-card.type-custom-mushroom-chips-card, ha-card.type-conditional, ha-card.type-vertical-stack, ha-card.type-horizontal-stack {
+      background: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+      box-shadow: none !important; border: none !important;
+    }
+    ha-card.type-heading::before, ha-card.type-heading::after,
+    ha-card.type-custom-mushroom-title-card::before, ha-card.type-custom-mushroom-title-card::after,
+    ha-card.type-custom-bubble-card::before, ha-card.type-custom-bubble-card::after,
+    ha-card.type-custom-mushroom-chips-card::before, ha-card.type-custom-mushroom-chips-card::after,
+    ha-card.type-conditional::before, ha-card.type-conditional::after,
+    ha-card.type-vertical-stack::before, ha-card.type-vertical-stack::after,
+    ha-card.type-horizontal-stack::before, ha-card.type-horizontal-stack::after { display: none; }
+    ha-card.type-heading { text-shadow: var(--afx-theme-heading-glow); }
+    /* Низкие карточки: меньше скругление, чтобы содержимое не заходило на дугу */
+    ha-card.type-tile, ha-card.type-button, ha-card.type-entity, ha-card.type-custom-mushroom-entity-card,
+    ha-card.type-custom-mushroom-template-card, ha-card.type-custom-button-card { border-radius: var(--afx-theme-radius-compact, 16px); }
+  # Тема тёмная: просим HA подставлять тёмные значения по умолчанию для всего, что не задано выше
+  modes:
+    dark:
+      afx-theme-mode: "dark"
+
+# Автоматический режим: тёмный по умолчанию, светлый — если в профиле выбран светлый
+Antarikfox Glass:
+  <<: *afx_glass
+  card-mod-theme: "Antarikfox Glass"
+  modes:
+    dark:
+      afx-theme-mode: "dark"
+    light: &afx_light
+      afx-theme-tint: "#ffffff"
+      afx-theme-alpha: ".55"
+      afx-theme-glow: ".75"
+      afx-theme-br: "#e879f9"
+      afx-theme-text-shadow: "none"
+      afx-theme-heading-glow: "0 0 14px rgba(129, 140, 248, .35)"
+      afx-theme-mode: "light"
+      ha-color-text-primary: "#0f172a"
+      ha-color-text-secondary: "rgba(15, 23, 42, 0.68)"
+      ha-color-text-disabled: "rgba(15, 23, 42, 0.4)"
+      ha-color-text-link: "#2563eb"
+      ha-color-form-background: "rgba(15, 23, 42, 0.05)"
+      ha-color-form-background-hover: "rgba(15, 23, 42, 0.08)"
+      ha-color-on-neutral-quiet: "#0f172a"
+      ha-color-on-neutral-normal: "#0f172a"
+      ha-color-fill-neutral-quiet-resting: "rgba(15, 23, 42, 0.05)"
+      ha-color-fill-neutral-normal-resting: "rgba(15, 23, 42, 0.08)"
+      ha-color-border-neutral-quiet: "rgba(15, 23, 42, 0.12)"
+      ha-color-border-neutral-normal: "rgba(15, 23, 42, 0.22)"
+      ha-heading-card-title-color: "#0f172a"
+      ha-heading-card-subtitle-color: "rgba(15, 23, 42, 0.68)"
+      ha-card-header-color: "#0f172a"
+      rgb-primary-text-color: "15, 23, 42"
+      text-light-primary-color: "#0f172a"
+      mdc-theme-on-primary: "#ffffff"
+      mdc-theme-on-surface: "#0f172a"
+      mdc-theme-text-primary-on-background: "#0f172a"
+      mdc-theme-text-secondary-on-background: "rgba(15, 23, 42, 0.68)"
+      mdc-theme-text-hint-on-background: "rgba(15, 23, 42, 0.5)"
+      mdc-theme-text-icon-on-background: "rgba(15, 23, 42, 0.68)"
+      mdc-theme-text-disabled-on-background: "rgba(15, 23, 42, 0.4)"
+      mdc-text-field-fill-color: "rgba(15, 23, 42, 0.05)"
+      mdc-text-field-ink-color: "#0f172a"
+      mdc-text-field-label-ink-color: "rgba(15, 23, 42, 0.68)"
+      mdc-text-field-idle-line-color: "rgba(15, 23, 42, 0.3)"
+      mdc-text-field-hover-line-color: "rgba(15, 23, 42, 0.55)"
+      mdc-text-field-outlined-idle-border-color: "rgba(15, 23, 42, 0.3)"
+      mdc-text-field-outlined-hover-border-color: "rgba(15, 23, 42, 0.55)"
+      mdc-text-field-disabled-fill-color: "rgba(15, 23, 42, 0.03)"
+      mdc-text-field-disabled-ink-color: "rgba(15, 23, 42, 0.4)"
+      mdc-select-fill-color: "rgba(15, 23, 42, 0.05)"
+      mdc-select-ink-color: "#0f172a"
+      mdc-select-label-ink-color: "rgba(15, 23, 42, 0.68)"
+      mdc-select-idle-line-color: "rgba(15, 23, 42, 0.3)"
+      mdc-select-hover-line-color: "rgba(15, 23, 42, 0.55)"
+      mdc-select-dropdown-icon-color: "rgba(15, 23, 42, 0.68)"
+      mdc-checkbox-unchecked-color: "rgba(15, 23, 42, 0.55)"
+      mdc-radio-unchecked-color: "rgba(15, 23, 42, 0.55)"
+      mdc-dialog-heading-ink-color: "#0f172a"
+      mdc-dialog-content-ink-color: "rgba(15, 23, 42, 0.8)"
+      paper-item-icon-color: "#475569"
+      paper-listbox-background-color: "#ffffff"
+      paper-dialog-background-color: "#ffffff"
+      paper-card-background-color: "rgba(255, 255, 255, 0.82)"
+      chip-background-color: "rgba(15, 23, 42, 0.06)"
+      primary-color: "#2563eb"
+      accent-color: "#7c3aed"
+      rgb-primary-color: "37, 99, 235"
+      primary-background-color: "#eef3fb"
+      secondary-background-color: "#e3eaf6"
+      primary-text-color: "#0f172a"
+      secondary-text-color: "rgba(15, 23, 42, 0.66)"
+      disabled-text-color: "rgba(15, 23, 42, 0.38)"
+      divider-color: "rgba(15, 23, 42, 0.1)"
+      card-background-color: "rgba(255, 255, 255, 0.82)"
+      ha-card-background: "rgba(255, 255, 255, 0.62)"
+      ha-card-border-color: "rgba(255, 255, 255, 0.85)"
+      app-header-background-color: "rgba(255, 255, 255, 0.7)"
+      app-header-text-color: "#0f172a"
+      app-header-border-bottom: "1px solid rgba(15, 23, 42, 0.08)"
+      sidebar-background-color: "rgba(255, 255, 255, 0.72)"
+      sidebar-text-color: "#1e293b"
+      sidebar-icon-color: "#475569"
+      sidebar-selected-icon-color: "#2563eb"
+      sidebar-selected-text-color: "#0f172a"
+      state-icon-color: "#3b5bdb"
+      input-ink-color: "#0f172a"
+      input-label-ink-color: "rgba(15, 23, 42, 0.62)"
+      mdc-theme-surface: "#ffffff"
+      ha-dialog-surface-background: "rgba(255, 255, 255, 0.88)"
+      lovelace-background: >-
+        radial-gradient(900px 600px at 10% -10%, rgba(56, 189, 248, 0.35), transparent 62%),
+        radial-gradient(700px 520px at 105% 25%, rgba(232, 121, 249, 0.28), transparent 60%),
+        radial-gradient(800px 600px at 40% 120%, rgba(129, 140, 248, 0.30), transparent 62%),
+        #eef3fb fixed
+
+Antarikfox Glass Daylight:
+  <<: [*afx_light, *afx_glass]
+  card-mod-theme: "Antarikfox Glass Daylight"
+  modes:
+    light:
+      afx-theme-mode: "light"
+
+Antarikfox Glass Ember:
+  <<: *afx_glass
+  afx-theme-tl: "#ffc46b"
+  afx-theme-mid: "#ff6a3d"
+  afx-theme-br: "#ff2d55"
+  afx-theme-tint: "#1a0c0c"
+  primary-color: "#ffb26b"
+  accent-color: "#ff4d6d"
+  rgb-primary-color: "255, 178, 107"
+  lovelace-background: >-
+    radial-gradient(900px 600px at 10% -8%, rgba(255, 106, 61, 0.30), transparent 62%),
+    radial-gradient(700px 520px at 105% 30%, rgba(255, 45, 85, 0.24), transparent 60%),
+    #0a0506 fixed
+  card-mod-theme: "Antarikfox Glass Ember"
+
+Antarikfox Glass Ice:
+  <<: *afx_glass
+  afx-theme-tl: "#f0f9ff"
+  afx-theme-mid: "#7dd3fc"
+  afx-theme-br: "#2563eb"
+  afx-theme-tint: "#0b1a2e"
+  afx-theme-blur: "24px"
+  lovelace-background: >-
+    radial-gradient(900px 600px at 15% -10%, rgba(125, 211, 252, 0.30), transparent 62%),
+    radial-gradient(700px 520px at 100% 100%, rgba(37, 99, 235, 0.30), transparent 60%),
+    #030812 fixed
+  card-mod-theme: "Antarikfox Glass Ice"
+
+Antarikfox Glass Cyber:
+  <<: *afx_glass
+  afx-theme-tl: "#00f0ff"
+  afx-theme-mid: "#ff2bd6"
+  afx-theme-br: "#7c3aed"
+  afx-theme-glow: "1.3"
+  primary-color: "#00f0ff"
+  accent-color: "#ff2bd6"
+  rgb-primary-color: "0, 240, 255"
+  lovelace-background: >-
+    radial-gradient(900px 600px at 0% 0%, rgba(0, 240, 255, 0.22), transparent 60%),
+    radial-gradient(800px 600px at 100% 100%, rgba(255, 43, 214, 0.22), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 4px),
+    #05030c fixed
+  card-mod-theme: "Antarikfox Glass Cyber"
+
+Antarikfox Glass Matrix:
+  <<: *afx_glass
+  afx-theme-tl: "#c8ff3d"
+  afx-theme-mid: "#22c55e"
+  afx-theme-br: "#0f766e"
+  afx-theme-tint: "#03140c"
+  primary-color: "#4ade80"
+  accent-color: "#c8ff3d"
+  rgb-primary-color: "74, 222, 128"
+  lovelace-background: >-
+    radial-gradient(900px 600px at 20% -10%, rgba(34, 197, 94, 0.26), transparent 62%),
+    radial-gradient(700px 520px at 100% 90%, rgba(15, 118, 110, 0.30), transparent 60%),
+    #020805 fixed
+  card-mod-theme: "Antarikfox Glass Matrix"
+
+# Новогодняя: золото, красный, хвоя; тёплые огни на фоне
+Antarikfox Glass New Year:
+  <<: *afx_glass
+  afx-theme-tl: "#ffd36b"
+  afx-theme-mid: "#ff3b4e"
+  afx-theme-br: "#22c55e"
+  afx-theme-tint: "#0c1410"
+  afx-theme-glow: "1.15"
+  afx-theme-font: "Comfortaa"
+  ha-font-family-body: "Comfortaa, Roboto, Noto, sans-serif"
+  ha-font-family-heading: "Comfortaa, Roboto, Noto, sans-serif"
+  primary-font-family: "Comfortaa, Roboto, Noto, sans-serif"
+  paper-font-common-base_-_font-family: "Comfortaa, Roboto, Noto, sans-serif"
+  mdc-typography-font-family: "Comfortaa, Roboto, Noto, sans-serif"
+  primary-color: "#ffd36b"
+  accent-color: "#ff3b4e"
+  rgb-primary-color: "255, 211, 107"
+  state-icon-active-color: "#ffd36b"
+  switch-checked-color: "#ffd36b"
+  switch-checked-track-color: "#ff3b4e"
+  lovelace-background: >-
+    radial-gradient(10px 10px at 12% 20%, rgba(255, 211, 107, .9), transparent 70%),
+    radial-gradient(8px 8px at 30% 8%, rgba(255, 59, 78, .9), transparent 70%),
+    radial-gradient(9px 9px at 55% 16%, rgba(34, 197, 94, .9), transparent 70%),
+    radial-gradient(8px 8px at 78% 10%, rgba(80, 160, 255, .9), transparent 70%),
+    radial-gradient(10px 10px at 92% 22%, rgba(255, 211, 107, .9), transparent 70%),
+    radial-gradient(900px 600px at 10% -10%, rgba(255, 59, 78, 0.22), transparent 62%),
+    radial-gradient(800px 600px at 100% 110%, rgba(34, 197, 94, 0.22), transparent 62%),
+    radial-gradient(700px 500px at 60% 40%, rgba(255, 211, 107, 0.08), transparent 70%),
+    #050a08 fixed
+  card-mod-theme: "Antarikfox Glass New Year"

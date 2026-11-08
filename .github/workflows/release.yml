@@ -1,0 +1,42 @@
+name: Release after validation
+on:
+  workflow_run:
+    workflows: [Validate]
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  release:
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+      - name: Publish version if not already released
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          if gh release view v3.8.0 >/dev/null 2>&1; then
+            echo 'v3.8.0 already exists; leaving the release unchanged.'
+            exit 0
+          fi
+          gh release create v3.8.0 \
+            --target "$VALIDATED_SHA" \
+            --title 'Antarikfox Studio 3.8.0' \
+            --notes-file CHANGELOG.md \
+            dist/antarikfox-glass-card.js \
+            dist/antarikfox-studio.html \
+            dist/antarikfox_glass.yaml

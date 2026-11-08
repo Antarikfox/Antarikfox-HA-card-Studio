@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Antarikfox Studio</title>
+<style>
+:root{
+  box-sizing:border-box;color-scheme:dark;
+  --bg:#04060d;--panel:rgba(9,13,28,.92);--line:rgba(160,190,255,.14);--text:#e6eeff;--muted:rgba(200,215,255,.62);--accent:#7dd3fc;
+  --font:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans',sans-serif;--mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){color-scheme:light;--bg:#eef3fb;--panel:rgba(250,251,255,.95);--line:rgba(15,23,42,.12);--text:#0f172a;--muted:rgba(15,23,42,.6);--accent:#2563eb}}
+:root[data-theme="dark"]{color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);display:grid;grid-template-rows:auto 1fr;
+  --primary-text-color:var(--text);--secondary-text-color:var(--muted);--divider-color:var(--line);--primary-color:var(--accent)}
+header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;margin-right:auto}
+.brand i{width:20px;height:20px;border-radius:7px;background:conic-gradient(from 200deg,#38bdf8,#22d3ee,#4ade80,#818cf8,#c084fc,#38bdf8);box-shadow:0 0 14px rgba(34,211,238,.6)}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;font-size:13px;border:1px solid var(--line);background:rgba(127,127,127,.08);cursor:pointer;color:var(--text);font:inherit;font-size:13px}
+.pill b{width:8px;height:8px;border-radius:50%;background:#94a3b8}
+.pill.ok b{background:#22c55e;box-shadow:0 0 8px #22c55e}
+.pill.err b{background:#ef4444;box-shadow:0 0 8px #ef4444}
+.btn{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;border:1px solid var(--line);background:rgba(127,127,127,.08);color:var(--text)}
+.btn:hover{background:rgba(127,127,127,.16)}
+.btn.hero{background:linear-gradient(120deg,#38bdf8,#818cf8 55%,#c084fc);color:#05070f;border:0}
+.btn:focus-visible,.pill:focus-visible,.cardrow button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn[disabled]{opacity:.45;cursor:default}
+.mode{display:inline-flex;padding:3px;border-radius:12px;border:1px solid var(--line);background:rgba(127,127,127,.08)}
+.mode button{all:unset;cursor:pointer;padding:6px 11px;border-radius:9px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.mode button[aria-pressed=true]{background:var(--accent);color:#05070f}
+.mode button.live[aria-pressed=true]{background:#ef4444;color:#fff}
+main{display:grid;grid-template-columns:230px minmax(0,1fr) 420px;min-height:0}
+@media (max-width:1180px){main{grid-template-columns:1fr}}
+aside.list,aside.ed{background:var(--panel);overflow:auto;overflow-x:hidden;padding:14px;min-width:0}
+aside.list{border-right:1px solid var(--line)}
+aside.ed{border-left:1px solid var(--line)}
+@media (max-width:1180px){
+  html,body{height:auto}
+  body{display:block}
+  header{position:relative}
+  main{display:flex;flex-direction:column}
+  aside.list,aside.ed{overflow:visible;border:0;border-top:1px solid var(--line)}
+  aside.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 10px;align-content:start}
+  aside.list h2{grid-column:1/-1}
+  aside.list #cards{display:contents}
+  main .stage{position:sticky;top:0;z-index:15;max-height:58vh;padding:14px;border-bottom:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+}
+h2{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:4px 0 10px}
+.cardrow{display:flex;align-items:center;gap:4px;margin-bottom:4px}
+.cardrow .nm{all:unset;flex:1;min-width:0;padding:9px 10px;border-radius:10px;cursor:pointer;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cardrow .nm:hover{background:rgba(127,127,127,.1)}
+.cardrow.sel .nm{background:color-mix(in srgb,var(--accent) 20%,transparent);font-weight:600}
+.brand .by{margin-left:6px;font-size:11.5px;font-weight:700;text-decoration:none;letter-spacing:.02em;background:linear-gradient(90deg,#38bdf8,#a78bfa,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand .by:hover{filter:brightness(1.25)}
+.tipline{max-width:min(560px,100%);font-size:13px;line-height:1.45;color:rgba(220,230,255,.82);text-align:center;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(160,190,255,.12);transition:opacity .4s}
+.tipline b{color:#a5d8ff;margin-right:6px}
+.credit{order:99;display:grid;gap:4px;margin:18px 0 6px;padding:12px;border-radius:14px;text-align:center;
+  background:linear-gradient(135deg,rgba(56,189,248,.10),rgba(167,139,250,.10),rgba(244,114,182,.10));border:1px solid var(--line)}
+.credit a{display:grid;gap:2px;text-decoration:none;color:inherit}
+.credit a b{font-size:16px;letter-spacing:.08em;background:linear-gradient(90deg,#38bdf8,#a78bfa,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.credit a span{font-size:12px;color:var(--accent)}
+.credit small{font-size:11px;color:var(--muted)}
+.modal.gmodal .box{width:min(860px,100%);max-height:88vh;overflow:hidden;grid-template-rows:auto auto 1fr auto}
+.gbody{overflow:auto;display:grid;gap:8px;padding-right:4px}
+.gbody details{border:1px solid var(--line);border-radius:14px;background:rgba(127,127,127,.05)}
+.gbody summary{cursor:pointer;padding:12px 14px;font-weight:700;font-size:14.5px;list-style:none;display:flex;gap:10px;align-items:center}
+.gbody summary::-webkit-details-marker{display:none}
+.gbody summary::after{content:'▾';margin-left:auto;opacity:.6;transition:transform .2s}
+.gbody details[open] summary::after{transform:rotate(180deg)}
+.gbody ol{margin:0;padding:0 16px 14px 34px;display:grid;gap:8px;font-size:13.5px;line-height:1.5}
+.gbody mark{background:rgba(250,204,21,.35);color:inherit;border-radius:3px}
+.gfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.gfoot a{color:var(--accent);text-decoration:none;font-weight:600}
+.cardrow .nm small{display:block;font-size:11px;font-weight:500;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.stage[data-bg=dark]{background:#05070d!important}
+.stage[data-bg=light]{background:#eef2f8!important}
+.stage[data-bg=checker]{background:repeating-conic-gradient(#2a2f3a 0 25%,#1b1f27 0 50%) 0 0/24px 24px!important}
+.dlist{display:grid;gap:4px;max-height:44vh;overflow:auto}
+.dlist button{all:unset;box-sizing:border-box;padding:9px 11px;border-radius:10px;cursor:pointer;font-size:13.5px;border:1px solid var(--line);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dlist button:hover,.dlist button:focus-visible{background:rgba(127,127,127,.14);outline:none}
+.dlist button small{color:var(--muted)}
+.cardrow .ic{all:unset;width:28px;height:28px;display:grid;place-items:center;border-radius:8px;cursor:pointer;color:var(--muted);font-size:13px}
+.cardrow .ic:hover{background:rgba(127,127,127,.14);color:var(--text)}
+.stage{position:relative;overflow:auto;padding:28px;display:flex;flex-direction:column;align-items:center;gap:18px;
+  background:radial-gradient(900px 600px at 15% -10%,rgba(37,99,235,.35),transparent 62%),radial-gradient(700px 520px at 100% 30%,rgba(124,58,237,.28),transparent 60%),#04060d;color:#eaf2ff}
+.stagebar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;color:rgba(220,230,255,.75);align-self:stretch;justify-content:center}
+.stagebar input[type=range]{accent-color:#7dd3fc}
+.pvbox{width:var(--pvw,380px);max-width:100%;transition:width .2s}
+.msg{font-size:13px;color:#fca5a5;max-width:420px;text-align:center}
+.ycap{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:18px 0 8px;font-weight:600;font-size:14px;flex-wrap:wrap}
+.ycap span.bt{display:flex;gap:6px;flex-wrap:wrap}
+pre{margin:0;padding:12px;border-radius:12px;background:#0a1022;border:1px solid var(--line);font:12px/1.5 var(--mono);color:#cfe0ff;white-space:pre;overflow:auto;max-height:300px}
+.modal,.modal.afx-ui{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(2,4,10,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.modal .box{width:min(460px,100%);display:grid;gap:12px;padding:20px;border-radius:20px;background:var(--panel);border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal h3{margin:0;font-size:17px}
+.modal p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
+.modal .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.stoast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:#0c1328;color:#eaf2ff;border:1px solid rgba(160,190,255,.25);
+  padding:10px 16px;border-radius:12px;font-size:13px;transition:.25s;pointer-events:none;z-index:60;max-width:90vw}
+.stoast.show{opacity:1;transform:translate(-50%,0)}
+ha-icon{display:inline-grid;place-items:center;width:var(--mdc-icon-size,24px);height:var(--mdc-icon-size,24px)}
+ha-icon svg{width:100%;height:100%;fill:currentColor}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><i></i>Antarikfox Studio <small id="ver" style="font-weight:500;font-size:11px;opacity:.6"></small><a class="by" href="https://antarikfox.ru" target="_blank" rel="noopener">by Antarikfox</a></div>
+  <button class="btn" id="guideBtn" type="button"></button>
+  <button class="pill" id="conn" type="button"><b></b><span id="connTxt"></span></button>
+  <span id="themeBox" class="afx-ui" style="min-width:210px"></span>
+  <a class="btn" id="full" href="antarikfox-studio.html" target="_blank" rel="noopener" hidden>⤢</a>
+  <div class="mode" role="group" id="langSeg"></div>
+  <div class="mode" role="group" id="modeBox"><button type="button" data-m="sandbox" aria-pressed="true"></button><button type="button" class="live" data-m="live" aria-pressed="false"></button></div>
+</header>
+<main>
+  <aside class="list">
+    <h2 id="hCards"></h2>
+    <div id="cards"></div>
+    <button class="btn" id="newCard" type="button" style="width:100%;justify-content:center;margin-top:8px"></button>
+    <button class="btn" id="impCard" type="button" style="width:100%;justify-content:center;margin-top:6px"></button>
+    <button class="btn" id="openDash" type="button" style="width:100%;justify-content:center;margin-top:6px"></button>
+    <div class="credit"><a href="https://antarikfox.ru" target="_blank" rel="noopener"><b>Antarikfox</b><span>antarikfox.ru</span></a><small>© <span id="yr"></span> Antarikfox · Antarikfox Glass</small></div>
+    <div style="display:flex;gap:6px;margin-top:6px"><button class="btn" id="bkp" type="button" style="flex:1;justify-content:center;font-size:12px"></button><button class="btn" id="rst" type="button" style="flex:1;justify-content:center;font-size:12px"></button></div>
+  </aside>
+  <section class="stage" id="stage">
+    <div class="stagebar"><label><span id="wLbl"></span> <input type="range" id="pvw" min="260" max="760" step="10" value="380"></label><span id="wVal">380px</span><span id="bgBox" class="afx-ui" style="min-width:150px"></span><button class="btn" id="stTog" type="button" hidden></button></div>
+    <div class="pvbox" id="pv"></div>
+    <div class="msg" id="msg"></div>
+    <div class="tipline" id="tipline" role="status"></div>
+  </section>
+  <aside class="ed">
+    <antarikfox-glass-card-editor id="editor"></antarikfox-glass-card-editor>
+    <div class="ycap"><span id="yCap"></span><span class="bt">
+      <button class="btn" id="cp1" type="button"></button><button class="btn" id="cp2" type="button"></button><button class="btn" id="dl" type="button"></button>
+    </span></div>
+    <pre id="yaml"></pre>
+    <div style="margin-top:12px;display:grid;gap:8px"><button class="btn hero" id="upd" type="button" style="width:100%;justify-content:center;background:linear-gradient(120deg,#22c55e,#14b8a6)" hidden></button><button class="btn hero" id="pub" type="button" style="width:100%;justify-content:center"></button></div>
+  </aside>
+</main>
+<div class="stoast" id="toast" role="status"></div>
+
+<script src="antarikfox-glass-card.js?v=3.8.0"></script>
+<script>
+(() => {
+'use strict';
+const AG = window.AntarikfoxGlass;
+if (!AG) {
+  document.body.innerHTML = '<p style="padding:24px;font:15px system-ui;color:#fca5a5">Не найден antarikfox-glass-card.js. Положите antarikfox-studio.html и antarikfox-glass-card.js вместе в /config/www/ и откройте /local/antarikfox-studio.html.</p>';
+  return;
+}
+const lang = AG.detectLang(null);
+const STUDIO_VERSION = '3.8.0';
+const TX = {
+  ru: {
+    connOff: 'Нет подключения — настроить', connOk: (v, n) => `HA ${v} · ${n} сущностей`, connErr: 'Ошибка входа — настроить', connecting: 'Подключение…',
+    sandbox: 'Песочница', live: 'Управление', liveWarn: 'Режим «Управление»: кнопки в предпросмотре будут по-настоящему включать устройства.',
+    sentSandbox: 'Песочница: команда не отправлена в HA — ', sent: 'Отправлено в HA: ',
+    cards: 'Мои карточки', newCard: '+ Новая карточка', imp: '📥 Импорт старой карточки', width: 'Ширина колонки',
+    yaml: 'YAML карточки', copy: 'Скопировать', copy2: 'Способ 2', dl: 'Скачать', copied: 'YAML скопирован', select: 'Выделено — нажмите Ctrl+C',
+    pub: '➕ Добавить на панель HA', theme: 'Тема HA', noThemes: 'Темы появятся после подключения',
+    setTitle: 'Подключение к Home Assistant', setText: 'Если студия открыта из самого HA (/local/antarikfox-studio.html), вход происходит автоматически. Иначе вставьте долгосрочный токен: Профиль → Безопасность → Долгосрочные токены доступа.',
+    url: 'Адрес HA', token: 'Токен (необязательно)', connect: 'Подключиться', cancel: 'Отмена', close: 'Закрыть',
+    rename: 'Переименовать', dup: 'Дублировать', del: 'Удалить', delQ: 'Удалить карточку «%s»?', yes: 'Удалить',
+    firstCard: 'Моя первая карточка', starter: 'Выберите сущность в «Быстрых макетах» → «Авто по сущности» — студия соберёт карточку под устройство.',
+    needConn: 'Сначала подключитесь к HA', pubTitle: 'Добавить на панель', dash: 'Панель', view: 'Вкладка', defaultDash: 'Обзор (основная)',
+    pubText: 'Карточка добавится в конец выбранной вкладки. Перед сохранением студия запомнит копию панели, чтобы можно было откатить.',
+    add: 'Добавить', added: 'Карточка добавлена на панель', undo: 'Откатить', undone: 'Панель возвращена как было',
+    autoDash: 'Эта панель автоматическая. Откройте её в HA → ✎ → «Взять управление», затем повторите.', yamlDash: 'Эта панель в YAML-режиме — добавьте YAML вручную.',
+    invalid: 'Карточке нужно содержимое: добавьте предмет в конструкторе или вложенную карточку.', name: 'Название',
+    pubShort: 'Добавить в HA', updShort: 'Обновить на панели', upd: '🔄 Обновить карточку на панели HA', updated: 'Карточка на панели обновлена', movedQ: 'Карточку на панели переместили или изменили вручную. Добавить её как новую?',
+    openDash: '📂 Открыть карточку с панели', openTitle: 'Открыть карточку с панели', openText: 'Выберите карточку: она откроется в студии, а «Обновить на панели» заменит её прямо на месте.', noCards: 'На этой вкладке нет карточек',
+    bkp: '⬇ Резервная копия', rst: '⬆ Восстановить', restored: 'Восстановлено карточек: ', badFile: 'Это не резервная копия студии',
+    stTog: '⇄ вкл/выкл', stTogT: 'Переключить состояние в предпросмотре (без отправки в HA)', bg: 'Фон', bgTheme: 'Фон темы', bgDark: 'Тёмный', bgLight: 'Светлый', bgChecker: 'Шахматка', langAuto: 'Авто', saveKey: 'Ctrl+S — сохранить на панель',
+    guide: '📖 Руководство', guideTitle: 'Руководство Antarikfox Studio', guideSearch: 'Поиск по руководству…', tip: 'Совет', nothingFound: 'Ничего не найдено',
+    emptyTitle: 'Пустая карточка', emptyHint: 'В «Конструкторе карточки» выберите сущность и нажмите «Авто по сущности» или любой предмет из палитры. Стиль — в разделах ниже.', full: 'Открыть студию на весь экран',
+  },
+  en: {
+    connOff: 'Not connected — set up', connOk: (v, n) => `HA ${v} · ${n} entities`, connErr: 'Login failed — set up', connecting: 'Connecting…',
+    sandbox: 'Sandbox', live: 'Control', liveWarn: '“Control” mode: buttons in the preview will really switch devices.',
+    sentSandbox: 'Sandbox: not sent to HA — ', sent: 'Sent to HA: ',
+    cards: 'My cards', newCard: '+ New card', imp: '📥 Import an old card', width: 'Column width',
+    yaml: 'Card YAML', copy: 'Copy', copy2: 'Method 2', dl: 'Download', copied: 'YAML copied', select: 'Selected — press Ctrl+C',
+    pub: '➕ Add to an HA dashboard', theme: 'HA theme', noThemes: 'Themes appear after connecting',
+    setTitle: 'Connect to Home Assistant', setText: 'If the studio is opened from HA itself (/local/antarikfox-studio.html), login is automatic. Otherwise paste a long-lived token: Profile → Security → Long-lived access tokens.',
+    url: 'HA address', token: 'Token (optional)', connect: 'Connect', cancel: 'Cancel', close: 'Close',
+    rename: 'Rename', dup: 'Duplicate', del: 'Delete', delQ: 'Delete card “%s”?', yes: 'Delete',
+    firstCard: 'My first card', starter: 'Pick an entity in “Quick layouts” → “Auto by entity” and the studio builds a card for the device.',
+    needConn: 'Connect to HA first', pubTitle: 'Add to dashboard', dash: 'Dashboard', view: 'View', defaultDash: 'Overview (default)',
+    pubText: 'The card is appended to the selected view. A copy of the dashboard is kept first so you can roll back.',
+    add: 'Add', added: 'Card added to the dashboard', undo: 'Roll back', undone: 'Dashboard restored',
+    autoDash: 'This dashboard is auto-generated. Open it in HA → ✎ → “Take control”, then retry.', yamlDash: 'This dashboard is in YAML mode — add the YAML manually.',
+    invalid: 'The card needs content: add a block in the builder or an inner card.', name: 'Name',
+    pubShort: 'Add to HA', updShort: 'Update on dashboard', upd: '🔄 Update the card on the HA dashboard', updated: 'Card updated on the dashboard', movedQ: 'The card was moved or edited on the dashboard. Add it as a new one?',
+    openDash: '📂 Open a card from a dashboard', openTitle: 'Open a card from a dashboard', openText: 'Pick a card: it opens in the studio, and “Update on dashboard” replaces it in place.', noCards: 'No cards on this view',
+    bkp: '⬇ Backup', rst: '⬆ Restore', restored: 'Cards restored: ', badFile: 'Not a studio backup',
+    stTog: '⇄ on/off', stTogT: 'Toggle the state in the preview (not sent to HA)', bg: 'Background', bgTheme: 'Theme background', bgDark: 'Dark', bgLight: 'Light', bgChecker: 'Checkerboard', langAuto: 'Auto', saveKey: 'Ctrl+S saves to the dashboard',
+    guide: '📖 Guide', guideTitle: 'Antarikfox Studio guide', guideSearch: 'Search the guide…', tip: 'Tip', nothingFound: 'Nothing found',
+    emptyTitle: 'Empty card', emptyHint: 'In “Card builder” pick an entity and tap “Auto by entity” or any block from the palette. Style is in the sections below.', full: 'Open the studio full screen',
+  },
+  zh: {
+    connOff: '未连接 — 去设置', connOk: (v, n) => `HA ${v} · ${n} 个实体`, connErr: '登录失败 — 去设置', connecting: '正在连接…',
+    sandbox: '沙盒', live: '控制', liveWarn: '“控制”模式：预览中的按钮会真实地开关设备。',
+    sentSandbox: '沙盒：未发送到 HA — ', sent: '已发送到 HA：',
+    cards: '我的卡片', newCard: '+ 新卡片', imp: '📥 导入旧卡片', width: '列宽',
+    yaml: '卡片 YAML', copy: '复制', copy2: '方法 2', dl: '下载', copied: 'YAML 已复制', select: '已选中 — 按 Ctrl+C',
+    pub: '➕ 添加到 HA 仪表板', theme: 'HA 主题', noThemes: '连接后显示主题',
+    setTitle: '连接 Home Assistant', setText: '如果工作室是从 HA 本身打开的（/local/antarikfox-studio.html），会自动登录。否则请粘贴长期令牌：个人资料 → 安全 → 长期访问令牌。',
+    url: 'HA 地址', token: '令牌（可选）', connect: '连接', cancel: '取消', close: '关闭',
+    rename: '重命名', dup: '复制', del: '删除', delQ: '删除卡片“%s”？', yes: '删除',
+    firstCard: '我的第一张卡片', starter: '在“快速布局”中选择实体 → “按实体自动”，工作室会为设备生成卡片。',
+    needConn: '请先连接 HA', pubTitle: '添加到仪表板', dash: '仪表板', view: '视图', defaultDash: '概览（默认）',
+    pubText: '卡片会添加到所选视图的末尾。保存前工作室会先备份仪表板，可以回滚。',
+    add: '添加', added: '卡片已添加到仪表板', undo: '回滚', undone: '仪表板已恢复',
+    autoDash: '这是自动生成的仪表板。请在 HA 中打开 → ✎ → “接管控制”，然后重试。', yamlDash: '此仪表板为 YAML 模式 — 请手动添加 YAML。',
+    invalid: '卡片需要内容：在搭建器中添加组件或内嵌卡片。', name: '名称',
+    pubShort: '添加到 HA', updShort: '更新到仪表板', upd: '🔄 更新 HA 仪表板上的卡片', updated: '仪表板上的卡片已更新', movedQ: '卡片在仪表板上被移动或修改过。要作为新卡片添加吗？',
+    openDash: '📂 从仪表板打开卡片', openTitle: '从仪表板打开卡片', openText: '选择一张卡片：它会在工作室中打开，“更新到仪表板”会原地替换它。', noCards: '此视图没有卡片',
+    bkp: '⬇ 备份', rst: '⬆ 恢复', restored: '已恢复卡片：', badFile: '这不是工作室备份',
+    stTog: '⇄ 开/关', stTogT: '在预览中切换状态（不发送到 HA）', bg: '背景', bgTheme: '主题背景', bgDark: '深色', bgLight: '浅色', bgChecker: '棋盘格', langAuto: '自动', saveKey: 'Ctrl+S 保存到仪表板',
+    emptyTitle: '空卡片', emptyHint: '在“卡片搭建器”中选择实体并点击“按实体自动”，或从组件面板中任选一个。样式在下方各部分中设置。', full: '全屏打开工作室',
+    guide: '📖 指南', guideTitle: 'Antarikfox Studio 指南', guideSearch: '在指南中搜索…', tip: '小贴士', nothingFound: '未找到',
+  },
+  ja: {
+    connOff: '未接続 — 設定する', connOk: (v, n) => `HA ${v} · エンティティ ${n} 件`, connErr: 'ログイン失敗 — 設定する', connecting: '接続中…',
+    sandbox: 'サンドボックス', live: '操作', liveWarn: '「操作」モード：プレビューのボタンで実際にデバイスが動きます。',
+    sentSandbox: 'サンドボックス：HA へは送信していません — ', sent: 'HA に送信：',
+    cards: 'マイカード', newCard: '+ 新しいカード', imp: '📥 古いカードを取り込む', width: '列の幅',
+    yaml: 'カードの YAML', copy: 'コピー', copy2: '方法 2', dl: 'ダウンロード', copied: 'YAML をコピーしました', select: '選択しました — Ctrl+C を押してください',
+    pub: '➕ HA のダッシュボードに追加', theme: 'HA テーマ', noThemes: '接続するとテーマが表示されます',
+    setTitle: 'Home Assistant に接続', setText: 'スタジオを HA から開いた場合（/local/antarikfox-studio.html）は自動でログインします。それ以外は長期アクセストークンを貼り付けてください：プロフィール → セキュリティ → 長期アクセストークン。',
+    url: 'HA のアドレス', token: 'トークン（任意）', connect: '接続', cancel: 'キャンセル', close: '閉じる',
+    rename: '名前を変更', dup: '複製', del: '削除', delQ: 'カード「%s」を削除しますか？', yes: '削除',
+    firstCard: '最初のカード', starter: '「クイックレイアウト」でエンティティを選び「エンティティから自動」を押すと、デバイスに合ったカードを作ります。',
+    needConn: '先に HA に接続してください', pubTitle: 'ダッシュボードに追加', dash: 'ダッシュボード', view: 'ビュー', defaultDash: '概要（標準）',
+    pubText: '選んだビューの最後にカードを追加します。保存前にダッシュボードのコピーを取るので、元に戻せます。',
+    add: '追加', added: 'ダッシュボードにカードを追加しました', undo: '元に戻す', undone: 'ダッシュボードを元に戻しました',
+    autoDash: 'これは自動生成のダッシュボードです。HA で開いて ✎ →「制御を引き継ぐ」を押してから、もう一度お試しください。', yamlDash: 'このダッシュボードは YAML モードです。YAML を手動で追加してください。',
+    invalid: 'カードに中身が必要です：ビルダーでブロックか内側のカードを追加してください。', name: '名前',
+    pubShort: 'HA に追加', updShort: 'ダッシュボードを更新', upd: '🔄 HA ダッシュボード上のカードを更新', updated: 'ダッシュボード上のカードを更新しました', movedQ: 'ダッシュボード上でカードが移動・編集されています。新しいカードとして追加しますか？',
+    openDash: '📂 ダッシュボードからカードを開く', openTitle: 'ダッシュボードからカードを開く', openText: 'カードを選ぶとスタジオで開きます。「ダッシュボードを更新」でその場所のまま置き換えます。', noCards: 'このビューにはカードがありません',
+    bkp: '⬇ バックアップ', rst: '⬆ 復元', restored: '復元したカード：', badFile: 'スタジオのバックアップではありません',
+    stTog: '⇄ オン/オフ', stTogT: 'プレビューで状態を切り替え（HA には送信しません）', bg: '背景', bgTheme: 'テーマの背景', bgDark: 'ダーク', bgLight: 'ライト', bgChecker: '市松模様', langAuto: '自動', saveKey: 'Ctrl+S でダッシュボードに保存',
+    emptyTitle: '空のカード', emptyHint: '「カードビルダー」でエンティティを選び「エンティティから自動」か、パレットのブロックを押してください。スタイルは下の各セクションで。', full: 'スタジオを全画面で開く',
+    guide: '📖 ガイド', guideTitle: 'Antarikfox Studio ガイド', guideSearch: 'ガイド内を検索…', tip: 'ヒント', nothingFound: '見つかりません',
+  },
+};
+const t = (k, ...a) => { const v = (TX[lang] || TX.en)[k] ?? TX.en[k]; return typeof v === 'function' ? v(...a) : v ?? k; };
+document.documentElement.lang = lang;
+const GUIDE = {
+  ru: [
+    ['🚀', 'Быстрый старт', [
+      'Нажмите «+ Новая карточка» слева: появится пустое стекло и подсказка.',
+      'В «Конструкторе карточки» начните вводить имя устройства в поле «Сущность для макета» и выберите его из списка.',
+      'Нажмите «✨ Авто по сущности»: студия сама соберёт карточку под тип устройства — свет, ТВ, ресивер, замок, камеру, датчик.',
+      'Нажмите «➕ Добавить в HA» рядом с «Удиви меня», выберите панель и вкладку. Готово: карточка уже на панели.',
+    ]],
+    ['🧱', 'Конструктор и предметы', [
+      'Карточка собирается из предметов: заголовок, фото, кнопки, ползунок, выбор из списка, график, камера, медиа и другие. Они сами управляют устройствами.',
+      'Перетаскивайте предметы за ручку ⠿, чтобы менять порядок. «Ряд» ставит предметы в строку, «Колонка» — друг под другом.',
+      '«👁 Показывать, когда» прячет предмет по состоянию, числу или времени: например, кнопка «Выключить» видна только когда устройство включено.',
+      'Для замков и других важных действий включите «Спрашивать подтверждение» в настройке нажатия.',
+    ]],
+    ['🖼', 'Фото «вкл/выкл» и «Только фото»', [
+      'Макет «🖼 Только фото» делает карточку самой фотографией: нажали — включилось, картинка сменилась.',
+      'Кнопка «☁ Загрузить на сервер фото «вкл» и «выкл»»: выберите оба файла сразу. Они сожмутся в WebP и сами лягут в /config/www/antarikfox/.',
+      'Лучше всего выглядят PNG с прозрачным фоном. Для них включите в «Стекле» переключатель «Без стекла и рамки».',
+      'Фото можно перетащить на строку состояния или вставить из буфера (Ctrl+V). Под каждым фото написано, где оно хранится.',
+    ]],
+    ['✨', 'Стиль: свечение, стекло, фон', [
+      'Начните с пресета в «Свечение и кант» или с «Образов» — это готовые сочетания цвета, текстуры и эффектов.',
+      '«Удиви меня» меняет только оформление: собранные предметы, размер и фон остаются на месте. Ошиблись — ↶ или Ctrl+Z.',
+      'Для светлой темы HA нажмите «☀ Светлая карточка»: фон станет белым, текст сам потемнеет.',
+      'Хорошее правило: одно яркое свечение и спокойное стекло. Непрозрачность 0.2–0.35 и размытие 14–22 px читаются лучше всего.',
+    ]],
+    ['🌌', 'Текстуры и эффекты', [
+      'Текстуры бывают статичные (рисунок на стекле) и живые (медленно двигаются). Живые подсвечиваются краями карточки.',
+      'Держите силу текстуры 0.08–0.18: текстура должна угадываться, а не спорить с текстом.',
+      'Эффекты лучше по одному-два на карточку. «Показывать: Когда включено» оживляет карточку только при работе устройства.',
+      '«Динамические события» дают короткий всплеск — фейерверк, волну, вспышку — при включении, выключении, нажатии или тревоге.',
+    ]],
+    ['🎄', 'Движение и праздник', [
+      'Наклон, подъём, параллакс и прожектор работают от мыши и от пальца. Покачивание и парение заметны и на планшете без касаний.',
+      'При включении эффекта он один раз проигрывается в предпросмотре — так видно, что он делает.',
+      'Гирлянда, снежная шапка и сосульки включаются в «Праздник и зима». «Новый год по календарю» включит их сам с декабря по январь.',
+      'Если на устройстве включено «Уменьшить движение», редактор покажет предупреждение и кнопку, чтобы всё равно показывать анимации.',
+    ]],
+    ['📐', 'Размер на панели', [
+      'В панелях с разделами ширина задаётся в «Размер на панели»: 12 — во всю ширину, 6 — половина, 4 — треть.',
+      'Высоту для карточек из конструктора оставляйте «Авто». Фиксированные ряды нужны, чтобы выровнять карточки в ряд.',
+      '«Содержимое по высоте» ставит содержимое высокой карточки сверху, по центру или снизу.',
+      'Ползунок «Ширина колонки» над предпросмотром показывает, как карточка будет выглядеть на телефоне и на планшете.',
+    ]],
+    ['☁', 'Панели HA: добавить, открыть, обновить', [
+      '«➕ Добавить в HA» кладёт карточку в конец выбранной вкладки. Перед этим студия сохраняет копию панели — «↶ Откатить» вернёт всё как было.',
+      'Студия запоминает, где лежит карточка (📍 в списке). Дальше «🔄 Обновить на панели» или Ctrl+S заменяет её на том же месте.',
+      '«📂 Открыть карточку с панели» берёт любую существующую карточку. Обычная карточка HA станет стеклянной на том же месте.',
+      'Держите «🧪 Песочницу» включённой, пока собираете: нажатия в предпросмотре не трогают настоящую технику.',
+    ]],
+    ['📥', 'Импорт старых карточек', [
+      '«📥 Импорт старой карточки»: вставьте YAML от button-card, mushroom, tile, picture-entity и других.',
+      '«Обернуть как есть» сохраняет старую карточку внутри стекла и убирает её фон и рамки, но оставляет фото.',
+      '«Пересобрать в конструкторе» разбирает карточку на предметы — дальше её можно менять кнопками, без YAML.',
+      'Студия находит сущность, цвета свечения, шрифт и фото по состояниям и подбирает эффекты под тип устройства.',
+    ]],
+    ['🎨', 'Советы по дизайну', [
+      'Одна мысль — одна карточка. Лучше три понятные карточки, чем одна перегруженная.',
+      'Повторяйте пресет или цвета для одной комнаты: панель смотрится цельно, а комнаты легко различать.',
+      'Крупное значение и маленькая подпись читаются издалека — это хорошо для настенного планшета.',
+      'Снег, гирлянды и яркие эффекты оставьте для 1–2 акцентных карточек, остальные — спокойнее.',
+    ]],
+    ['⚡', 'Скорость и планшеты', [
+      'На слабых панелях поставьте «Производительность: Лёгкий» — эффекты и размытие отключатся, стекло останется.',
+      '«Притушить при простое» снижает яркость и нагрузку, если панелью долго не пользуются.',
+      'Фото студия сама сжимает до 1200 px в WebP — не загружайте мегабайтные PNG напрямую.',
+      'Живые текстуры и эффекты на экране вне видимости ставятся на паузу автоматически.',
+    ]],
+    ['🛠', 'Решение проблем', [
+      'Изменения не видны? Браузер держит старый файл: в ресурсах панели поднимите версию (?v=…), в студии сверху видна загруженная версия.',
+      'Полоса под фото: в конструкторе должно быть только «Фото», отступ и промежуток 0, высота фото «По пропорциям фото».',
+      'Не работают анимации: проверьте предупреждение «Уменьшить движение» в разделе «Движение и детали».',
+      'Фото «сохранено во встроенное хранилище HA» вместо www: значит, дополнение File editor выключено — карточка всё равно работает.',
+    ]],
+  ],
+  en: [
+    ['🚀', 'Quick start', [
+      'Tap “+ New card” on the left: an empty glass with a hint appears.',
+      'In “Card builder” start typing the device name in “Entity for the layout” and pick it from the list.',
+      'Tap “✨ Auto by entity”: the studio builds a card for the device type — light, TV, receiver, lock, camera, sensor.',
+      'Tap “➕ Add to HA” next to “Surprise me”, choose a dashboard and a view. Done: the card is on your dashboard.',
+    ]],
+    ['🧱', 'Builder and blocks', [
+      'A card is made of blocks: title, photo, buttons, slider, option picker, graph, camera, media and more. They control devices themselves.',
+      'Drag blocks by the ⠿ handle to reorder. “Row” puts blocks side by side, “Column” stacks them.',
+      '“👁 Show when” hides a block by state, number or time: e.g. a “Turn off” button only shows while the device is on.',
+      'For locks and other important actions enable “Ask for confirmation” in the tap settings.',
+    ]],
+    ['🖼', 'On/off photos and “Photo only”', [
+      'The “🖼 Photo only” layout makes the card the photo itself: tap — it turns on and the picture changes.',
+      '“☁ Upload on and off photos to the server”: pick both files at once. They are compressed to WebP and saved to /config/www/antarikfox/.',
+      'PNGs with a transparent background look best. For them enable “No glass or frame” in the “Glass” section.',
+      'Drop a photo onto a state row or paste it (Ctrl+V). Each photo shows where it is stored.',
+    ]],
+    ['✨', 'Style: glow, glass, background', [
+      'Start from a preset in “Glow & edge” or from “Looks” — ready combinations of color, texture and effects.',
+      '“Surprise me” only changes the look: blocks, size and background stay. Made a mistake — ↶ or Ctrl+Z.',
+      'For a light HA theme tap “☀ Light card”: the background turns white and the text turns dark by itself.',
+      'A good rule: one bright glow and calm glass. Opacity 0.2–0.35 and blur 14–22 px read best.',
+    ]],
+    ['🌌', 'Textures and effects', [
+      'Textures are static (a pattern on the glass) or live (slowly moving). Live ones are lit by the card edges.',
+      'Keep texture strength at 0.08–0.18: it should be felt, not compete with the text.',
+      'One or two effects per card is plenty. “Show: When on” brings the card to life only while the device works.',
+      '“Dynamic events” play a short burst — fireworks, a wave, a flash — on turn on, turn off, tap or alert.',
+    ]],
+    ['🎄', 'Motion and holidays', [
+      'Tilt, lift, parallax and spotlight follow the mouse and your finger. Sway and floating are visible on a tablet without touching.',
+      'Enabling an effect plays it once in the preview, so you can see what it does.',
+      'The garland, snow cap and icicles are in “Holiday & winter”. “New Year by calendar” turns them on by itself in December and January.',
+      'If the device has “Reduce motion” on, the editor shows a warning and a button to show animations anyway.',
+    ]],
+    ['📐', 'Size on the dashboard', [
+      'In sections dashboards set the width in “Size on dashboard”: 12 is full width, 6 is half, 4 is a third.',
+      'Leave the height on “Auto” for builder cards. Fixed rows help to line cards up.',
+      '“Content vertical position” puts the content of a tall card at the top, center or bottom.',
+      'The “Column width” slider above the preview shows how the card looks on a phone and on a tablet.',
+    ]],
+    ['☁', 'HA dashboards: add, open, update', [
+      '“➕ Add to HA” appends the card to the chosen view. The studio saves a copy of the dashboard first — “↶ Roll back” restores it.',
+      'The studio remembers where the card lives (📍 in the list). Then “🔄 Update on dashboard” or Ctrl+S replaces it in place.',
+      '“📂 Open a card from a dashboard” takes any existing card. A regular HA card becomes glass in the same spot.',
+      'Keep “🧪 Sandbox” on while building: taps in the preview do not touch real devices.',
+    ]],
+    ['📥', 'Importing old cards', [
+      '“📥 Import an old card”: paste YAML from button-card, mushroom, tile, picture-entity and others.',
+      '“Wrap as is” keeps the old card inside the glass and removes its background and borders, but keeps photos.',
+      '“Rebuild in the builder” turns the card into blocks — after that you edit it with buttons, without YAML.',
+      'The studio finds the entity, glow colors, font and per-state photos and picks effects for the device type.',
+    ]],
+    ['🎨', 'Design tips', [
+      'One idea — one card. Three clear cards beat one overloaded card.',
+      'Repeat a preset or colors within a room: the dashboard looks whole and rooms are easy to tell apart.',
+      'A large value with a small caption reads from afar — great for a wall tablet.',
+      'Keep snow, garlands and bright effects for 1–2 accent cards and make the rest calmer.',
+    ]],
+    ['⚡', 'Speed and tablets', [
+      'On weak panels set “Performance: Lite” — effects and blur turn off, the glass stays.',
+      '“Dim when idle” lowers brightness and load when the panel is not used for a while.',
+      'The studio compresses photos to 1200 px WebP itself — no need to upload multi-megabyte PNGs.',
+      'Live textures and effects pause automatically when the card is off screen.',
+    ]],
+    ['🛠', 'Troubleshooting', [
+      'Changes not visible? The browser keeps an old file: bump the version (?v=…) in dashboard resources; the studio header shows the loaded version.',
+      'A strip under the photo: the builder should contain only “Photo”, padding and gap 0, photo height “Photo proportions”.',
+      'Animations do not work: check the “Reduce motion” warning in “Motion & details”.',
+      'Photo “saved to HA image storage” instead of www: the File editor add-on is off — the card still works.',
+    ]],
+  ],
+  zh: [
+    ['🚀', '快速开始', [
+      '点击左侧“+ 新卡片”：会出现一块空玻璃和提示。',
+      '在“卡片搭建器”的“布局使用的实体”中输入设备名称，并从列表中选择。',
+      '点击“✨ 按实体自动”：工作室会根据设备类型生成卡片 — 灯光、电视、功放、门锁、摄像头、传感器。',
+      '点击“给我惊喜”旁边的“➕ 添加到 HA”，选择仪表板和视图。完成：卡片已经在仪表板上。',
+    ]],
+    ['🧱', '搭建器与组件', [
+      '卡片由组件组成：标题、照片、按钮、滑块、选项选择、图表、摄像头、媒体等。组件可直接控制设备。',
+      '拖动 ⠿ 手柄调整顺序。“行”让组件并排，“列”让组件上下排列。',
+      '“👁 显示条件”可按状态、数值或时间隐藏组件：例如“关闭”按钮只在设备开启时显示。',
+      '门锁等重要操作，请在点击设置中开启“需要确认”。',
+    ]],
+    ['🖼', '开/关照片与“仅照片”', [
+      '“🖼 仅照片”布局让卡片本身就是照片：点击 — 设备开启，图片随之切换。',
+      '“☁ 上传开和关照片到服务器”：请同时选择两个文件。它们会被压缩为 WebP 并保存到 /config/www/antarikfox/。',
+      '透明背景的 PNG 效果最好。此时请在“玻璃”中开启“无玻璃无边框”。',
+      '可以把照片拖到状态行上，或用 Ctrl+V 粘贴。每张照片下方都会显示存放位置。',
+    ]],
+    ['✨', '样式：光晕、玻璃、背景', [
+      '从“光晕与边框”中的预设或“风格”开始 — 它们是现成的颜色、纹理和特效组合。',
+      '“给我惊喜”只改变外观：组件、尺寸和背景都会保留。改错了 — 按 ↶ 或 Ctrl+Z。',
+      '使用 HA 浅色主题时点击“☀ 浅色卡片”：背景变白，文字会自动变深。',
+      '好用的原则：一个明亮的光晕，加上安静的玻璃。不透明度 0.2–0.35、模糊 14–22 px 最易阅读。',
+    ]],
+    ['🌌', '纹理与特效', [
+      '纹理分为静态（玻璃上的图案）和动态（缓慢移动）。动态纹理会被卡片边缘照亮。',
+      '纹理强度保持在 0.08–0.18：要隐约可见，而不是与文字抢眼。',
+      '每张卡片一两个特效就足够。“显示时机：打开时”只在设备工作时让卡片动起来。',
+      '“动态事件”会在开启、关闭、点击或警报时播放短暂效果 — 烟花、波纹、闪光。',
+    ]],
+    ['🎄', '动效与节日', [
+      '倾斜、抬起、视差和聚光灯会跟随鼠标和手指。摇摆和悬浮在平板上无需触摸也能看到。',
+      '开启某个效果时，它会在预览中演示一次，便于了解作用。',
+      '彩灯、积雪和冰柱在“节日与冬季”中开启。“按日历过新年”会在 12 月到 1 月自动开启它们。',
+      '如果设备开启了“减少动态效果”，编辑器会显示提示，并提供仍然显示动画的按钮。',
+    ]],
+    ['📐', '仪表板中的尺寸', [
+      '在分区仪表板中，于“仪表板中的尺寸”设置宽度：12 为全宽，6 为一半，4 为三分之一。',
+      '搭建器卡片的高度建议保持“自动”。固定行数用于让卡片对齐。',
+      '“内容垂直位置”可把高卡片的内容放在顶部、居中或底部。',
+      '预览上方的“列宽”滑块可查看卡片在手机和平板上的样子。',
+    ]],
+    ['☁', 'HA 仪表板：添加、打开、更新', [
+      '“➕ 添加到 HA”把卡片放到所选视图的末尾。保存前工作室会备份仪表板 — “↶ 回滚”可恢复原状。',
+      '工作室会记住卡片的位置（列表中的 📍）。之后用“🔄 更新到仪表板”或 Ctrl+S 原地替换。',
+      '“📂 从仪表板打开卡片”可以打开任何现有卡片。普通 HA 卡片会在原位置变成玻璃卡片。',
+      '搭建时请保持“🧪 沙盒”开启：预览中的点击不会影响真实设备。',
+    ]],
+    ['📥', '导入旧卡片', [
+      '“📥 导入旧卡片”：粘贴 button-card、mushroom、tile、picture-entity 等卡片的 YAML。',
+      '“原样包裹”把旧卡片放进玻璃中，去掉它的背景和边框，但保留照片。',
+      '“在搭建器中重建”把卡片拆成组件 — 之后用按钮编辑，无需 YAML。',
+      '工作室会识别实体、光晕颜色、字体和按状态切换的照片，并按设备类型挑选特效。',
+    ]],
+    ['🎨', '设计建议', [
+      '一张卡片只表达一件事。三张清晰的卡片胜过一张拥挤的卡片。',
+      '同一房间重复使用同一预设或配色：仪表板更统一，房间也更容易区分。',
+      '大号数值配小号说明，远处也能看清 — 非常适合壁挂平板。',
+      '积雪、彩灯和强烈特效留给 1–2 张重点卡片，其余保持低调。',
+    ]],
+    ['⚡', '速度与平板', [
+      '性能较弱的面板请选择“性能：精简” — 特效和模糊会关闭，玻璃保留。',
+      '“空闲变暗”会在长时间不用面板时降低亮度和负载。',
+      '工作室会自动把照片压缩为 1200 px 的 WebP — 无需直接上传数兆的 PNG。',
+      '卡片不在屏幕上时，动态纹理和特效会自动暂停。',
+    ]],
+    ['🛠', '常见问题', [
+      '看不到修改？浏览器缓存了旧文件：在仪表板资源中提高版本号（?v=…）；工作室顶部会显示已加载的版本。',
+      '照片下方有一条：搭建器中应只有“照片”，内边距和间距为 0，照片高度选“按照片比例”。',
+      '动画不工作：请查看“动效与细节”中关于“减少动态效果”的提示。',
+      '照片“已存入 HA 图片存储”而不是 www：说明 File editor 加载项未运行 — 卡片仍可正常使用。',
+    ]],
+  ],
+  ja: [
+    ['🚀', 'クイックスタート', [
+      '左の「+ 新しいカード」を押すと、空のガラスとヒントが表示されます。',
+      '「カードビルダー」の「レイアウト用のエンティティ」にデバイス名を入力し、リストから選びます。',
+      '「✨ エンティティから自動」を押すと、照明・テレビ・AV アンプ・ドアロック・カメラ・センサーなど種類に合ったカードを作ります。',
+      '「おまかせ」の隣の「➕ HA に追加」でダッシュボードとビューを選べば完成。カードはもうダッシュボードにあります。',
+    ]],
+    ['🧱', 'ビルダーとブロック', [
+      'カードはブロックでできています：タイトル、写真、ボタン、スライダー、選択リスト、グラフ、カメラ、メディアなど。ブロックがデバイスを直接操作します。',
+      '⠿ ハンドルをドラッグして順番を変えます。「横並び」は横に、「縦並び」は縦に並べます。',
+      '「👁 表示する条件」で状態・数値・時間によってブロックを隠せます。たとえば「オフにする」ボタンはオンのときだけ表示。',
+      'ドアロックなど重要な操作は、タップの設定で「確認を求める」をオンにしましょう。',
+    ]],
+    ['🖼', 'オン/オフの写真と「写真だけ」', [
+      '「🖼 写真だけ」レイアウトでは、カードそのものが写真になります。タップするとオンになり、写真が切り替わります。',
+      '「☁ オンとオフの写真をサーバーへ」：2 つのファイルを同時に選んでください。WebP に圧縮され /config/www/antarikfox/ に保存されます。',
+      '背景が透明な PNG がいちばんきれいです。その場合は「ガラス」で「ガラスも枠もなし」をオンに。',
+      '写真は状態の行にドロップするか、Ctrl+V で貼り付けられます。各写真の下に保存場所が表示されます。',
+    ]],
+    ['✨', 'スタイル：光、ガラス、背景', [
+      '「光と縁」のプリセットか「ルック」から始めましょう。色・テクスチャ・エフェクトの完成された組み合わせです。',
+      '「おまかせ」が変えるのは見た目だけ。ブロック・サイズ・背景はそのままです。間違えたら ↶ か Ctrl+Z。',
+      'HA のライトテーマでは「☀ ライトカード」を。背景が白になり、文字は自動で暗くなります。',
+      'コツは、明るい光をひとつと、落ち着いたガラス。不透明度 0.2–0.35、ぼかし 14–22 px がいちばん読みやすいです。',
+    ]],
+    ['🌌', 'テクスチャとエフェクト', [
+      'テクスチャには静止（ガラスの模様）とライブ（ゆっくり動く）があります。ライブはカードの縁の光で照らされます。',
+      'テクスチャの強さは 0.08–0.18 に。文字と張り合わず、さりげなく感じる程度が理想です。',
+      'エフェクトはカード 1 枚に 1〜2 個で十分。「表示：オンのとき」ならデバイスが動いている間だけカードが生き生きします。',
+      '「ダイナミックイベント」は、オン・オフ・タップ・アラートのときに花火・波紋・フラッシュなどを短く再生します。',
+    ]],
+    ['🎄', '動きと季節', [
+      '傾き・浮き上がり・パララックス・スポットライトはマウスと指に反応します。揺れとふわふわはタブレットで触れなくても見えます。',
+      'エフェクトをオンにすると、プレビューで一度再生されるので動きが分かります。',
+      'ガーランド・雪の帽子・つららは「季節と冬」にあります。「暦に合わせて新年」なら 12 月と 1 月に自動でオンになります。',
+      '端末で「視差効果を減らす」がオンの場合、エディターに警告と、それでもアニメーションを表示するボタンが出ます。',
+    ]],
+    ['📐', 'ダッシュボード上のサイズ', [
+      'セクション型ダッシュボードでは「ダッシュボード上のサイズ」で幅を決めます。12 は全幅、6 は半分、4 は 3 分の 1。',
+      'ビルダーで作ったカードの高さは「自動」のままがおすすめ。固定の行数はカードを揃えたいときに。',
+      '「中身の縦位置」で、高いカードの中身を上・中央・下に置けます。',
+      'プレビュー上の「列の幅」スライダーで、スマホやタブレットでの見え方を確認できます。',
+    ]],
+    ['☁', 'HA ダッシュボード：追加・開く・更新', [
+      '「➕ HA に追加」は選んだビューの最後にカードを置きます。その前にダッシュボードのコピーを保存するので「↶ 元に戻す」で戻せます。',
+      'スタジオはカードの場所を覚えています（リストの 📍）。その後は「🔄 ダッシュボードを更新」か Ctrl+S で同じ場所のまま置き換えます。',
+      '「📂 ダッシュボードからカードを開く」で既存のどのカードも開けます。通常の HA カードは同じ場所でガラスのカードになります。',
+      '作業中は「🧪 サンドボックス」をオンに。プレビューでのタップは実際の機器を動かしません。',
+    ]],
+    ['📥', '古いカードの取り込み', [
+      '「📥 古いカードを取り込む」：button-card、mushroom、tile、picture-entity などの YAML を貼り付けます。',
+      '「そのまま包む」は古いカードをガラスの中に入れ、背景と枠を取り除きますが、写真は残します。',
+      '「ビルダーで作り直す」はカードをブロックに分解します。以後は YAML なしでボタン操作で編集できます。',
+      'スタジオはエンティティ・光の色・フォント・状態ごとの写真を見つけ、デバイスの種類に合うエフェクトを選びます。',
+    ]],
+    ['🎨', 'デザインのコツ', [
+      'カード 1 枚にテーマはひとつ。詰め込んだ 1 枚より、分かりやすい 3 枚のほうが伝わります。',
+      '部屋ごとに同じプリセットや色を繰り返すと、ダッシュボードにまとまりが出て部屋の区別もつけやすくなります。',
+      '大きな値と小さな説明は遠くからでも読めます。壁掛けタブレットにぴったりです。',
+      '雪・ガーランド・派手なエフェクトはアクセントの 1〜2 枚に絞り、ほかは落ち着かせましょう。',
+    ]],
+    ['⚡', '速さとタブレット', [
+      '非力なパネルでは「パフォーマンス：軽量」に。エフェクトとぼかしがオフになり、ガラスは残ります。',
+      '「放置で暗く」は、しばらく使わないときに明るさと負荷を下げます。',
+      '写真はスタジオが自動で 1200 px の WebP に圧縮します。数 MB の PNG をそのまま上げる必要はありません。',
+      '画面外のカードでは、ライブテクスチャとエフェクトが自動で一時停止します。',
+    ]],
+    ['🛠', 'トラブルシューティング', [
+      '変更が反映されない？ブラウザが古いファイルを使っています。ダッシュボードのリソースでバージョン（?v=…）を上げてください。スタジオ上部に読み込み中のバージョンが出ます。',
+      '写真の下に帯が出る：ビルダーには「写真」だけを置き、余白と間隔を 0、写真の高さを「写真の比率」にします。',
+      'アニメーションが動かない：「動きとディテール」の「視差効果を減らす」の警告を確認してください。',
+      '写真が www ではなく「HA 画像ストレージに保存」された：File editor アドオンが停止しています。カードはそのまま使えます。',
+    ]],
+  ],
+};
+const guideFor = () => GUIDE[lang] || GUIDE.en;
+const SITE = 'https://antarikfox.ru';
+const $ = (id) => document.getElementById(id);
+const { el, copyText, copyLegacy } = AG.ui;
+const store = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* нет места */ } } };
+const toast = (m) => { const x = $('toast'); x.textContent = m; x.classList.add('show'); clearTimeout(x._h); x._h = setTimeout(() => x.classList.remove('show'), 2600); };
+
+/* ── Иконки MDI вне HA: подгружаем SVG, при отсутствии интернета показываем эмодзи ── */
+const ICON_CACHE = new Map();
+const DOMAIN_ICON = { light: 'mdi:lightbulb', switch: 'mdi:toggle-switch', media_player: 'mdi:television', climate: 'mdi:thermostat', sensor: 'mdi:eye', binary_sensor: 'mdi:radiobox-blank', cover: 'mdi:window-shutter', lock: 'mdi:lock', camera: 'mdi:video', person: 'mdi:account', fan: 'mdi:fan', weather: 'mdi:weather-partly-cloudy', alarm_control_panel: 'mdi:shield-home', vacuum: 'mdi:robot-vacuum', input_boolean: 'mdi:toggle-switch-outline', script: 'mdi:script-text', scene: 'mdi:palette', automation: 'mdi:robot', input_select: 'mdi:format-list-bulleted', select: 'mdi:format-list-bulleted', number: 'mdi:ray-vertex', input_number: 'mdi:ray-vertex', sun: 'mdi:white-balance-sunny', update: 'mdi:package-up', device_tracker: 'mdi:account' };
+const loadIcon = (name) => {
+  if (!ICON_CACHE.has(name)) {
+    const [set, n] = String(name).split(':');
+    ICON_CACHE.set(name, set === 'mdi' && n
+      ? fetch(`https://cdn.jsdelivr.net/npm/@mdi/svg@7.4.47/svg/${n}.svg`).then((r) => (r.ok ? r.text() : null)).catch(() => null)
+      : Promise.resolve(null));
+  }
+  return ICON_CACHE.get(name);
+};
+if (!customElements.get('ha-icon')) {
+  customElements.define('ha-icon', class extends HTMLElement {
+    static get observedAttributes() { return ['icon']; }
+    set icon(v) { if (v !== this._i) this.setAttribute('icon', v); }
+    get icon() { return this._i; }
+    connectedCallback() { Object.assign(this.style, { display: 'inline-grid', placeItems: 'center', width: 'var(--mdc-icon-size,24px)', height: 'var(--mdc-icon-size,24px)', lineHeight: '1' }); }
+    attributeChangedCallback() {
+      const name = this.getAttribute('icon'); this._i = name;
+      loadIcon(name).then((svg) => {
+        if (this._i !== name) return;
+        if (svg) this.innerHTML = svg.replace(/<svg /, '<svg aria-hidden="true" width="100%" height="100%" fill="currentColor" style="display:block" ');
+        else { this.textContent = (AG.MDI_EMOJI || {})[name] || this.dataset.emo || '●'; this.style.fontSize = 'calc(var(--mdc-icon-size,24px) * .8)'; }
+      });
+    }
+  });
+}
+if (!customElements.get('ha-state-icon')) {
+  customElements.define('ha-state-icon', class extends HTMLElement {
+    set stateObj(so) { this._so = so; const ic = (so && so.attributes && so.attributes.icon) || DOMAIN_ICON[String(so && so.entity_id).split('.')[0]] || 'mdi:help-circle-outline'; if (ic !== this._ic) { this._ic = ic; this.innerHTML = ''; const i = document.createElement('ha-icon'); i.dataset.emo = (AG.DOMAIN_EMOJI || {})[String(so && so.entity_id).split('.')[0]] || ''; i.setAttribute('icon', ic); this.appendChild(i); } }
+    get stateObj() { return this._so; }
+    set hass(h) { this._h = h; }
+  });
+}
+
+/* ── UI-кит карточки (выпадающие списки) в обычном документе ── */
+const css = document.createElement('style');
+css.textContent = AG.ui.EDITOR_CSS.replace(':host{', '.afx-ui{');
+document.head.appendChild(css);
+const uiHost = { _lang: lang, _open: null, _openCtrl(c) { if (this._open && this._open !== c) this._open.close(); this._open = c; }, shadowRoot: document };
+document.addEventListener('click', (e) => { if (uiHost._open && !uiHost._open.el.contains(e.target)) { uiHost._open.close(); uiHost._open = null; } }, true);
+const mkSelect = (options, onChange, extra = {}) => new AG.ui.UISelect(uiHost, { options, onChange, search: options.length > 8, ...extra });
+
+/* ═════════ Подключение к HA по WebSocket ═════════ */
+class HAConn {
+  constructor(url, token) { this.url = url; this.token = token; this.id = 1; this.pending = new Map(); }
+  open() {
+    return new Promise((resolve, reject) => {
+      let ws;
+      try { ws = new WebSocket(`${this.url.replace(/^http/, 'ws').replace(/\/+$/, '')}/api/websocket`); } catch (e) { reject(e); return; }
+      this.ws = ws;
+      let authed = false;
+      ws.onmessage = (ev) => {
+        let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+        if (m.type === 'auth_required') { ws.send(JSON.stringify({ type: 'auth', access_token: this.token })); return; }
+        if (m.type === 'auth_ok') { authed = true; this.version = m.ha_version; resolve(this); return; }
+        if (m.type === 'auth_invalid') { reject(new Error('auth_invalid')); ws.close(); return; }
+        if (m.type === 'result') { const p = this.pending.get(m.id); if (p) { this.pending.delete(m.id); if (m.success) p.res(m.result); else p.rej(new Error((m.error && (m.error.code || m.error.message)) || 'error')); } return; }
+        if (m.type === 'event' && this.onEvent) this.onEvent(m.event);
+      };
+      ws.onerror = () => { if (!authed) reject(new Error('connect_failed')); };
+      ws.onclose = () => { this.closed = true; this.pending.forEach((p) => p.rej(new Error('closed'))); this.pending.clear(); if (authed && this.onClose) this.onClose(); };
+    });
+  }
+  call(msg) {
+    return new Promise((res, rej) => {
+      if (!this.ws || this.ws.readyState !== 1) { rej(new Error('closed')); return; }
+      const id = this.id++;
+      this.pending.set(id, { res, rej });
+      this.ws.send(JSON.stringify({ ...msg, id }));
+      setTimeout(() => { if (this.pending.has(id)) { this.pending.delete(id); rej(new Error('timeout')); } }, 20000);
+    });
+  }
+}
+/** Токен: сессия HA с того же адреса (hassTokens) или долгосрочный токен из настроек */
+async function getToken(url) {
+  const manual = store.get('afx-studio-token', '');
+  try {
+    const tk = JSON.parse(localStorage.getItem('hassTokens') || 'null');
+    if (tk && tk.access_token && (!tk.hassUrl || tk.hassUrl.replace(/\/+$/, '') === url.replace(/\/+$/, ''))) {
+      if (!tk.expires || Date.now() < tk.expires - 30000) return tk.access_token;
+      if (tk.refresh_token) {
+        const r = await fetch(`${url.replace(/\/+$/, '')}/auth/token`, { method: 'POST', body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: tk.refresh_token, client_id: tk.clientId || `${url.replace(/\/+$/, '')}/` }) });
+        if (r.ok) { const j = await r.json(); tk.access_token = j.access_token; tk.expires = Date.now() + j.expires_in * 1000; localStorage.setItem('hassTokens', JSON.stringify(tk)); return j.access_token; }
+      }
+    }
+  } catch (e) { /* сессии нет */ }
+  return manual || null;
+}
+
+let conn = null, states = {}, live = false, hass = null, themes = null, retry = 0;
+const defaultUrl = () => store.get('afx-studio-url', '') || (/^https?:$/.test(location.protocol) ? location.origin : 'http://homeassistant.local:8123');
+function setStatus(kind, txt) { const p = $('conn'); p.classList.toggle('ok', kind === 'ok'); p.classList.toggle('err', kind === 'err'); $('connTxt').textContent = txt; }
+
+async function connect() {
+  const url = defaultUrl();
+  const token = await getToken(url);
+  if (!token) { setStatus('off', t('connOff')); return false; }
+  setStatus('off', t('connecting'));
+  try {
+    const c = new HAConn(url, token);
+    await c.open();
+    conn = c; retry = 0;
+    const list = await c.call({ type: 'get_states' });
+    states = Object.fromEntries(list.map((s) => [s.entity_id, s]));
+    c.onEvent = (ev) => {
+      const d = ev && ev.data;
+      if (!d || !d.entity_id) return;
+      states = { ...states };
+      if (d.new_state) states[d.entity_id] = d.new_state; else delete states[d.entity_id];
+      pushHass();
+    };
+    await c.call({ type: 'subscribe_events', event_type: 'state_changed' });
+    c.onClose = () => { conn = null; setStatus('err', t('connOff')); setTimeout(connect, Math.min(30000, 2000 * ++retry)); };
+    try { themes = await c.call({ type: 'frontend/get_themes' }); } catch (e) { themes = null; }
+    buildThemeSelect();
+    pushHass(true);
+    setStatus('ok', t('connOk', c.version || '', Object.keys(states).length));
+    return true;
+  } catch (e) {
+    setStatus('err', e.message === 'auth_invalid' ? t('connErr') : t('connOff'));
+    return false;
+  }
+}
+
+/* ── hass для карточки и редактора ── */
+const OFFISH = new Set(['off', 'idle', 'standby', 'paused', 'closed', 'unavailable', 'unknown']);
+function simulate(d, s, data) {
+  const id = data && data.entity_id, e = id && states[id];
+  if (!e) return false;
+  const n = { ...e, attributes: { ...e.attributes } }, key = `${d}.${s}`, dom = id.split('.')[0];
+  if (key === 'homeassistant.toggle') n.state = OFFISH.has(n.state) ? (dom === 'media_player' ? 'on' : dom === 'cover' ? 'open' : 'on') : (dom === 'cover' ? 'closed' : 'off');
+  else if (s === 'turn_on') { n.state = 'on'; if (data.brightness_pct != null) n.attributes.brightness = Math.round(data.brightness_pct * 2.55); if (data.effect) n.attributes.effect = data.effect; }
+  else if (s === 'turn_off') n.state = 'off';
+  else if (key === 'media_player.volume_set') n.attributes.volume_level = data.volume_level;
+  else if (key === 'media_player.media_play_pause') n.state = n.state === 'playing' ? 'paused' : 'playing';
+  else if (key === 'media_player.select_source') n.attributes.source = data.source;
+  else if (s === 'select_option') n.state = data.option;
+  else if (key === 'climate.set_temperature') n.attributes.temperature = data.temperature;
+  else if (key === 'climate.set_hvac_mode') n.state = data.hvac_mode;
+  else if (key === 'cover.set_cover_position') { n.attributes.current_position = data.position; n.state = data.position > 0 ? 'open' : 'closed'; }
+  else if (key === 'fan.set_percentage') n.attributes.percentage = data.percentage;
+  else if (key === 'lock.lock') n.state = 'locked';
+  else if (key === 'lock.unlock') n.state = 'unlocked';
+  else if (s === 'set_value') n.state = String(data.value);
+  else return false;
+  n.last_changed = new Date().toISOString();
+  states = { ...states, [id]: n };
+  pushHass(true);
+  return true;
+}
+function callService(d, s, data = {}, target) {
+  const label = `${d}.${s}${data.entity_id ? ` → ${data.entity_id}` : ''}`;
+  if (live && conn) {
+    return conn.call({ type: 'call_service', domain: d, service: s, service_data: data, ...(target ? { target } : {}) })
+      .then(() => toast(t('sent') + label)).catch((e) => toast(`⚠ ${label}: ${e.message}`));
+  }
+  simulate(d, s, data);
+  toast(t('sentSandbox') + label);
+  return Promise.resolve();
+}
+const makeHass = () => ({
+  states, language: lang, locale: { language: lang }, user: { is_admin: true },
+  __token: conn ? conn.token : undefined,
+  fetchWithAuth: (p, init = {}) => fetch(`${conn ? conn.url.replace(/\/+$/, '') : ''}${p}`, { ...init, headers: { ...(init.headers || {}), ...(conn ? { Authorization: `Bearer ${conn.token}` } : {}) } }),
+  callService, callWS: (m) => (conn ? conn.call(m) : Promise.reject(new Error('offline'))),
+});
+let pushT = 0;
+function pushHass(now) {
+  const go = () => { pushT = 0; hass = makeHass(); if (preview) preview.hass = hass; editor.hass = hass; if (conn) setStatus('ok', t('connOk', conn.version || '', Object.keys(states).length)); };
+  if (now) { clearTimeout(pushT); go(); return; }
+  if (!pushT) pushT = setTimeout(go, 150);
+}
+
+/* ── Темы HA в предпросмотре ── */
+let themeSel = null, appliedVars = [];
+function applyTheme(name) {
+  const stage = $('stage');
+  appliedVars.forEach((k) => stage.style.removeProperty(k)); appliedVars = [];
+  stage.style.background = '';
+  const th = themes && themes.themes && themes.themes[name];
+  if (!th) return;
+  const vars = { ...th, ...((th.modes && th.modes.dark) || {}) };
+  delete vars.modes;
+  Object.entries(vars).forEach(([k, v]) => {
+    if (/^card-mod/.test(k) || typeof v !== 'string') return;
+    if (k === 'lovelace-background') { stage.style.background = v.replace(/\s+fixed\s*$/, ''); return; }
+    stage.style.setProperty(`--${k}`, v); appliedVars.push(`--${k}`);
+  });
+  store.set('afx-studio-theme', name);
+}
+function buildThemeSelect() {
+  const box = $('themeBox'); box.textContent = '';
+  const names = themes && themes.themes ? Object.keys(themes.themes).sort((a, b) => (/antarikfox/i.test(b) - /antarikfox/i.test(a)) || a.localeCompare(b)) : [];
+  if (!names.length) { box.textContent = ''; return; }
+  themeSel = mkSelect(names.map((n) => ({ value: n, label: n })), (v) => applyTheme(v), { label: t('theme'), placeholder: t('theme') });
+  const pick = store.get('afx-studio-theme', '') || (names.find((n) => /^antarikfox glass$/i.test(n)) || names.find((n) => /antarikfox/i.test(n)) || themes.default_theme);
+  themeSel.set(pick); applyTheme(pick);
+  box.appendChild(themeSel.el);
+}
+
+/* ═════════ Карточки студии ═════════ */
+const KEY = 'afx-studio-cards';
+const uid = () => Math.random().toString(36).slice(2, 10);
+let cards = store.get(KEY, null);
+if (!Array.isArray(cards) || !cards.length) {
+  cards = [{ id: uid(), name: t('firstCard'), config: { type: 'custom:antarikfox-glass-card', preset: 'aurora', texture: 'plexus', texture_opacity: 0.1,
+    content: { padding: 16, gap: 12, blocks: [{ type: 'title', text: 'Antarikfox Studio', icon: 'mdi:creation' }, { type: 'text', text: t('starter') }] } } }];
+}
+let cur = store.get('afx-studio-cur', cards[0].id);
+if (!cards.find((c) => c.id === cur)) cur = cards[0].id;
+let saveT = 0;
+const save = () => { clearTimeout(saveT); saveT = setTimeout(() => { store.set(KEY, cards); store.set('afx-studio-cur', cur); }, 300); };
+const curCard = () => cards.find((c) => c.id === cur);
+
+function renderList() {
+  const box = $('cards'); box.textContent = '';
+  cards.forEach((c) => {
+    const row = el('div', `cardrow${c.id === cur ? ' sel' : ''}`);
+    const nm = el('button', 'nm', { type: 'button', text: c.name || '—' });
+    if (c.placement) nm.appendChild(el('small', '', { text: `📍 ${c.placement.label || ''}` }));
+    nm.addEventListener('click', () => selectCard(c.id));
+    const ib = (txt, title, fn) => { const b = el('button', 'ic', { type: 'button', title, 'aria-label': title, text: txt }); b.addEventListener('click', fn); return b; };
+    row.append(nm,
+      ib('✎', t('rename'), () => { const inp = el('input', 'in', { type: 'text', 'aria-label': t('name') }); inp.className = 'in'; inp.value = c.name; inp.style.cssText = 'flex:1;min-width:0;padding:7px 9px;border-radius:9px;border:1px solid var(--accent);background:transparent;color:inherit;font:inherit';
+        nm.replaceWith(inp); inp.focus(); inp.select(); const done = () => { c.name = inp.value.trim() || c.name; save(); renderList(); }; inp.addEventListener('change', done); inp.addEventListener('blur', done); }),
+      ib('⧉', t('dup'), () => { const n = { id: uid(), name: `${c.name} 2`, config: JSON.parse(JSON.stringify(c.config)) } /* копия не привязана к месту на панели */; cards.splice(cards.indexOf(c) + 1, 0, n); selectCard(n.id); }),
+      ib('✕', t('del'), () => confirmBox(t('delQ').replace('%s', c.name), t('yes'), () => { cards = cards.filter((x) => x !== c); if (!cards.length) cards.push({ id: uid(), name: t('firstCard'), config: { type: 'custom:antarikfox-glass-card', preset: 'aurora', content: { blocks: [] } } }); if (cur === c.id) cur = cards[0].id; selectCard(cur); })));
+    box.appendChild(row);
+  });
+}
+
+let preview = null;
+function renderPreview() {
+  const pv = $('pv'), c = curCard();
+  if (!preview) { preview = document.createElement('antarikfox-glass-card'); pv.appendChild(preview); }
+  const cfg = c.config || {};
+  const empty = !(cfg.card || cfg.cards || (cfg.content && Array.isArray(cfg.content.blocks) && cfg.content.blocks.length));
+  try {
+    preview.setConfig(empty ? { ...cfg, content: { padding: 18, gap: 10, blocks: [{ type: 'title', text: t('emptyTitle'), icon: 'mdi:creation' }, { type: 'text', text: t('emptyHint') }] } } : cfg);
+    $('msg').textContent = ''; preview.style.display = '';
+  } catch (e) { $('msg').textContent = t('invalid'); preview.style.display = 'none'; }
+  if (hass) preview.hass = hass;
+}
+function renderYaml() {
+  $('yaml').textContent = AG.YAML.dump(curCard().config);
+}
+function selectCard(id) {
+  cur = id; save(); renderList();
+  const c = curCard();
+  if (preview) { preview.remove(); preview = null; }
+  renderPreview(); renderYaml();
+  refreshActions();
+  editor.setConfig(c.config);
+}
+/** Кнопки «Добавить в HA» / «Обновить на панели» — рядом с «Удиви меня» и внизу */
+function refreshActions() {
+  const c = curCard();
+  const pubA = { icon: '➕', label: t('pubShort'), title: t('saveKey'), onClick: () => publish() };
+  editor.extraActions = c && c.placement
+    ? [{ icon: '🔄', label: t('updShort'), title: `${t('saveKey')} · ${c.placement.label || ''}`, hero: true, onClick: () => updateOnDash() }, pubA]
+    : [{ ...pubA, hero: true }];
+  $('upd').hidden = !(c && c.placement);
+  const ent = mainEntity(c && c.config);
+  $('stTog').hidden = !ent;
+}
+const mainEntity = (cfg) => {
+  if (!cfg) return null;
+  if (cfg.entity) return cfg.entity;
+  const walk = (bl) => { for (const b of bl || []) { if (b.entity) return b.entity; const r = walk(b.blocks || b.items); if (r) return r; } return null; };
+  return walk(cfg.content && cfg.content.blocks) || (cfg.card && cfg.card.entity) || null;
+};
+const cardsOf = (vw) => (Array.isArray(vw.sections)
+  ? vw.sections.flatMap((sc, si) => (sc.cards || []).map((cd, ci) => ({ c: cd, sec: si, idx: ci })))
+  : (vw.cards || []).map((cd, ci) => ({ c: cd, sec: -1, idx: ci })));
+const cardAt = (vw, p) => (p.sec >= 0 ? ((vw.sections || [])[p.sec] || {}).cards || [] : vw.cards || [])[p.idx];
+const describe = (cd) => `${String(cd.type || '?').replace(/^custom:/, '')}${cd.entity || cd.title || cd.name || cd.heading ? ` · ${cd.entity || cd.title || cd.name || cd.heading}` : (cd.card && cd.card.entity ? ` · ${cd.card.entity}` : '')}`;
+function doneModal(title, onUndo) {
+  modal((box, close) => {
+    const r2 = el('div', 'row');
+    const undo = el('button', 'btn', { type: 'button', text: `↶ ${t('undo')}` }), ok = el('button', 'btn hero', { type: 'button', text: t('close') });
+    undo.addEventListener('click', async () => { try { await onUndo(); toast(t('undone')); close(); } catch (e) { toast(`⚠ ${e.message}`); } });
+    ok.addEventListener('click', close);
+    r2.append(undo, ok);
+    box.append(el('h3', '', { text: `✓ ${title}` }), r2);
+  });
+}
+async function updateOnDash() {
+  const c = curCard(), pl = c && c.placement;
+  if (!pl) { publish(); return; }
+  if (!conn) { toast(t('needConn')); settings(); return; }
+  try {
+    const cfg = await conn.call({ type: 'lovelace/config', url_path: pl.url_path });
+    const vw = cfg.views && cfg.views[pl.view];
+    let pos = null;
+    if (vw) {
+      const at = cardAt(vw, pl);
+      if (at && JSON.stringify(at) === pl.fp) pos = { sec: pl.sec, idx: pl.idx };
+      else { const f = cardsOf(vw).find((x) => JSON.stringify(x.c) === pl.fp); if (f) pos = { sec: f.sec, idx: f.idx }; }
+    }
+    if (!pos) { confirmBox(t('movedQ'), t('add'), () => publish()); return; }
+    const backup = JSON.parse(JSON.stringify(cfg));
+    store.set(`afx-backup-${pl.url_path || 'default'}`, { t: Date.now(), config: backup });
+    const card = JSON.parse(JSON.stringify(c.config));
+    if (pos.sec >= 0) vw.sections[pos.sec].cards[pos.idx] = card; else vw.cards[pos.idx] = card;
+    await conn.call({ type: 'lovelace/config/save', url_path: pl.url_path, config: cfg });
+    c.placement = { ...pl, sec: pos.sec, idx: pos.idx, fp: JSON.stringify(card) };
+    save(); renderList();
+    doneModal(t('updated'), () => conn.call({ type: 'lovelace/config/save', url_path: pl.url_path, config: backup }));
+  } catch (e) { toast(`⚠ ${e.message}`); }
+}
+async function listDashes() {
+  let dashes = [{ url_path: null, title: t('defaultDash') }];
+  try { const l = await conn.call({ type: 'lovelace/dashboards/list' }); dashes = dashes.concat(l.filter((d) => d.mode !== 'yaml').map((d) => ({ url_path: d.url_path, title: d.title || d.url_path }))); } catch (e) { /* только основная */ }
+  return dashes;
+}
+async function openFromDash() {
+  if (!conn) { toast(t('needConn')); settings(); return; }
+  const dashes = await listDashes();
+  modal((box, close) => {
+    const msg = el('p', ''), viewBox = el('div', 'fld'), list = el('div', 'dlist');
+    const dSel = mkSelect(dashes.map((d, i) => ({ value: String(i), label: d.title })), async (v) => {
+      const dash = dashes[Number(v)]; viewBox.textContent = ''; list.textContent = ''; msg.textContent = '';
+      try {
+        const cfg = await conn.call({ type: 'lovelace/config', url_path: dash.url_path });
+        if (cfg.strategy) { msg.textContent = t('autoDash'); return; }
+        const views = cfg.views || [];
+        const vSel = mkSelect(views.map((vw, i) => ({ value: String(i), label: vw.title || vw.path || `#${i + 1}` })), (vi) => {
+          const vw = views[Number(vi)], items = cardsOf(vw);
+          list.textContent = '';
+          if (!items.length) { list.appendChild(el('p', '', { text: t('noCards') })); return; }
+          items.forEach((x, k) => {
+            const btn = el('button', '', { type: 'button' });
+            btn.append(document.createTextNode(`${k + 1}. ${describe(x.c)} `), el('small', '', { text: x.sec >= 0 ? `· ${x.sec + 1}/${x.idx + 1}` : '' }));
+            btn.addEventListener('click', () => {
+              let conf;
+              try { conf = AG.convertCard(JSON.parse(JSON.stringify(x.c))).config; } catch (e) { conf = { type: 'custom:antarikfox-glass-card', preset: 'aurora', card: x.c }; }
+              const label = `${dash.title} / ${vw.title || vw.path || `#${Number(vi) + 1}`}`;
+              const n = { id: uid(), name: describe(x.c).split(' · ').pop().slice(0, 40), config: conf,
+                placement: { url_path: dash.url_path, view: Number(vi), sec: x.sec, idx: x.idx, fp: JSON.stringify(x.c), label } };
+              cards.push(n); close(); selectCard(n.id);
+            });
+            list.appendChild(btn);
+          });
+        }, { placeholder: t('view') });
+        viewBox.append(el('span', 'lbt', { text: t('view') }), vSel.el);
+      } catch (e) { msg.textContent = /config_not_found|yaml/i.test(e.message) ? t('yamlDash') : `⚠ ${e.message}`; }
+    }, { placeholder: t('dash') });
+    const dBox = el('div', 'fld'); dBox.append(el('span', 'lbt', { text: t('dash') }), dSel.el);
+    const row = el('div', 'row'); const cancel = el('button', 'btn', { type: 'button', text: t('cancel') });
+    cancel.addEventListener('click', close); row.appendChild(cancel);
+    box.append(el('h3', '', { text: t('openTitle') }), el('p', '', { text: t('openText') }), dBox, viewBox, msg, list, row);
+  });
+}
+
+const editor = $('editor');
+editor.lang = lang;
+editor.addEventListener('config-changed', (e) => {
+  const c = curCard();
+  c.config = { ...e.detail.config, type: 'custom:antarikfox-glass-card' };
+  save(); renderPreview(); renderYaml();
+  $('stTog').hidden = !mainEntity(c.config);
+});
+
+/* ── Диалоги ── */
+function modal(build) {
+  document.querySelectorAll('.modal').forEach((m) => m.remove());
+  const ov = el('div', 'modal', { role: 'dialog', 'aria-modal': 'true' });
+  const box = el('div', 'box afx-ui');
+  ov.appendChild(box); document.body.appendChild(ov);
+  const close = () => ov.remove();
+  ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+  ov.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  build(box, close);
+  setTimeout(() => { const f = box.querySelector('input,button'); if (f) f.focus(); }, 30);
+  return close;
+}
+function confirmBox(text, yesTxt, onYes) {
+  modal((box, close) => {
+    const row = el('div', 'row');
+    const no = el('button', 'btn', { type: 'button', text: t('cancel') }), yes = el('button', 'btn hero', { type: 'button', text: yesTxt });
+    no.addEventListener('click', close); yes.addEventListener('click', () => { close(); onYes(); });
+    row.append(no, yes); box.append(el('p', '', { text }), row);
+  });
+}
+function settings() {
+  modal((box, close) => {
+    const url = el('input', 'in', { type: 'url', 'aria-label': t('url') }); url.value = defaultUrl();
+    const tok = el('textarea', 'in ta', { 'aria-label': t('token'), spellcheck: 'false' }); tok.style.minHeight = '70px'; tok.value = store.get('afx-studio-token', '');
+    const lab = (txt, n) => { const f = el('label', 'fld'); f.append(el('span', 'lbt', { text: txt }), n); return f; };
+    const row = el('div', 'row');
+    const cancel = el('button', 'btn', { type: 'button', text: t('cancel') }), go = el('button', 'btn hero', { type: 'button', text: t('connect') });
+    cancel.addEventListener('click', close);
+    go.addEventListener('click', async () => {
+      store.set('afx-studio-url', url.value.trim()); store.set('afx-studio-token', tok.value.trim());
+      if (conn && conn.ws) { conn.onClose = null; conn.ws.close(); conn = null; }
+      close(); await connect();
+    });
+    row.append(cancel, go);
+    box.append(el('h3', '', { text: t('setTitle') }), el('p', '', { text: t('setText') }), lab(t('url'), url), lab(t('token'), tok), row);
+  });
+}
+async function publish() {
+  if (!conn) { toast(t('needConn')); settings(); return; }
+  const dashes = await listDashes();
+  modal((box, close) => {
+    let dash = null, cfg = null, view = null;
+    const msg = el('p', '');
+    const viewBox = el('div', 'fld');
+    const row = el('div', 'row');
+    const cancel = el('button', 'btn', { type: 'button', text: t('cancel') }), add = el('button', 'btn hero', { type: 'button', text: t('add') });
+    add.disabled = true;
+    const dSel = mkSelect(dashes.map((d, i) => ({ value: String(i), label: d.title })), async (v) => {
+      dash = dashes[Number(v)]; cfg = null; view = null; add.disabled = true; viewBox.textContent = ''; msg.textContent = '';
+      try {
+        cfg = await conn.call({ type: 'lovelace/config', url_path: dash.url_path });
+        if (cfg.strategy) { msg.textContent = t('autoDash'); cfg = null; return; }
+        const views = cfg.views || [];
+        const vSel = mkSelect(views.map((vw, i) => ({ value: String(i), label: vw.title || vw.path || `#${i + 1}` })), (vi) => { view = Number(vi); add.disabled = false; }, { placeholder: t('view') });
+        viewBox.append(el('span', 'lbt', { text: t('view') }), vSel.el);
+      } catch (e) { msg.textContent = /config_not_found|yaml/i.test(e.message) ? t('yamlDash') : `⚠ ${e.message}`; }
+    }, { placeholder: t('dash') });
+    const dBox = el('div', 'fld'); dBox.append(el('span', 'lbt', { text: t('dash') }), dSel.el);
+    cancel.addEventListener('click', close);
+    add.addEventListener('click', async () => {
+      if (!cfg || view === null) return;
+      const backup = JSON.parse(JSON.stringify(cfg));
+      store.set(`afx-backup-${dash.url_path || 'default'}`, { t: Date.now(), config: backup });
+      const vw = cfg.views[view], card = JSON.parse(JSON.stringify(curCard().config));
+      if (vw.type === 'sections' || Array.isArray(vw.sections)) {
+        vw.sections = vw.sections || [];
+        if (!vw.sections.length) vw.sections.push({ type: 'grid', cards: [] });
+        const sec = vw.sections[vw.sections.length - 1];
+        (sec.cards = sec.cards || []).push(card);
+      } else (vw.cards = vw.cards || []).push(card);
+      const placed = Array.isArray(vw.sections)
+        ? { sec: vw.sections.length - 1, idx: vw.sections[vw.sections.length - 1].cards.length - 1 }
+        : { sec: -1, idx: vw.cards.length - 1 };
+      try {
+        await conn.call({ type: 'lovelace/config/save', url_path: dash.url_path, config: cfg });
+        const cc = curCard();
+        cc.placement = { url_path: dash.url_path, view, ...placed, fp: JSON.stringify(card), label: `${dash.title} / ${vw.title || vw.path || `#${view + 1}`}` };
+        save(); renderList(); refreshActions();
+        box.textContent = '';
+        const r2 = el('div', 'row');
+        const undo = el('button', 'btn', { type: 'button', text: `↶ ${t('undo')}` }), ok = el('button', 'btn hero', { type: 'button', text: t('close') });
+        undo.addEventListener('click', async () => { try { await conn.call({ type: 'lovelace/config/save', url_path: dash.url_path, config: backup }); toast(t('undone')); close(); } catch (e) { toast(`⚠ ${e.message}`); } });
+        ok.addEventListener('click', close);
+        r2.append(undo, ok);
+        box.append(el('h3', '', { text: `✓ ${t('added')}` }), r2);
+      } catch (e) { msg.textContent = `⚠ ${e.message}`; }
+    });
+    row.append(cancel, add);
+    box.append(el('h3', '', { text: t('pubTitle') }), el('p', '', { text: t('pubText') }), dBox, viewBox, msg, row);
+  });
+}
+
+/* ── Кнопки ── */
+$('hCards').textContent = t('cards'); $('newCard').textContent = t('newCard'); $('impCard').textContent = t('imp');
+$('wLbl').textContent = t('width'); $('yCap').textContent = t('yaml'); $('cp1').textContent = t('copy'); $('cp2').textContent = t('copy2'); $('dl').textContent = `⬇ ${t('dl')}`; $('pub').textContent = t('pub');
+const [mSand, mLive] = $('modeBox').querySelectorAll('button');
+mSand.textContent = `🧪 ${t('sandbox')}`; mLive.textContent = `⚡ ${t('live')}`;
+const setMode = (l) => { live = l; mSand.setAttribute('aria-pressed', String(!l)); mLive.setAttribute('aria-pressed', String(l)); if (l) toast(t('liveWarn')); };
+mSand.addEventListener('click', () => setMode(false));
+mLive.addEventListener('click', () => confirmBox(t('liveWarn'), t('live'), () => setMode(true)));
+$('conn').addEventListener('click', settings);
+$('newCard').addEventListener('click', () => {
+  const n = { id: uid(), name: `${t('firstCard').split(' ')[0]} ${cards.length + 1}`, config: { type: 'custom:antarikfox-glass-card', preset: 'aurora', content: { padding: 16, gap: 12, blocks: [] } } };
+  cards.push(n); selectCard(n.id);
+  setTimeout(() => { const sec = editor.shadowRoot && editor.shadowRoot.querySelector('.sec[data-id=builder]'); if (sec) { if (!sec.classList.contains('open')) sec.querySelector('.sh').click(); sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }, 120);
+});
+$('impCard').addEventListener('click', () => editor.openImport());
+$('openDash').textContent = t('openDash'); $('openDash').addEventListener('click', openFromDash);
+$('upd').textContent = t('upd'); $('upd').addEventListener('click', updateOnDash);
+$('bkp').textContent = t('bkp'); $('rst').textContent = t('rst');
+$('bkp').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify({ studio: 'antarikfox', version: STUDIO_VERSION, saved: new Date().toISOString(), cards }, null, 2)], { type: 'application/json' }));
+  a.download = `antarikfox-studio-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+});
+$('rst').addEventListener('click', () => {
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/json,.json';
+  inp.addEventListener('change', async () => {
+    try {
+      const j = JSON.parse(await inp.files[0].text());
+      if (!j || j.studio !== 'antarikfox' || !Array.isArray(j.cards)) throw new Error('bad');
+      const add = j.cards.filter((c) => c && c.config).map((c) => ({ ...c, id: uid() }));
+      cards = cards.concat(add); save(); renderList(); toast(t('restored') + add.length);
+    } catch (e) { toast(`⚠ ${t('badFile')}`); }
+  });
+  inp.click();
+});
+/* язык: явный выбор в шапке */
+(() => {
+  const box = $('langSeg'); let ov = null;
+  try { ov = localStorage.getItem('afx-lang'); } catch (e) { /* без хранилища */ }
+  [['', t('langAuto')], ['ru', 'RU'], ['en', 'EN'], ['zh', '中文'], ['ja', '日本語']].forEach(([v, txt]) => {
+    const b = el('button', '', { type: 'button', text: txt, 'aria-pressed': String((ov || '') === v) });
+    b.addEventListener('click', () => { try { if (v) localStorage.setItem('afx-lang', v); else localStorage.removeItem('afx-lang'); } catch (e) { /* без хранилища */ } location.reload(); });
+    box.appendChild(b);
+  });
+  window.addEventListener('afx-lang-changed', () => location.reload());
+})();
+/* руководство и советы */
+function openGuide(focus) {
+  modal((box, close) => {
+    box.parentElement.classList.add('gmodal');
+    const head = el('div', 'row'); head.style.justifyContent = 'space-between';
+    const cl = el('button', 'btn', { type: 'button', text: '✕', 'aria-label': t('close') }); cl.addEventListener('click', close);
+    head.append(el('h3', '', { text: t('guideTitle') }), cl);
+    const q = el('input', 'in', { type: 'search', placeholder: t('guideSearch'), 'aria-label': t('guideSearch') });
+    q.style.cssText = 'width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(127,127,127,.08);color:inherit;font:inherit';
+    const body = el('div', 'gbody');
+    const esc = (x) => x.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+    const render = () => {
+      const f = q.value.trim().toLowerCase(); body.textContent = ''; let any = false;
+      guideFor().forEach(([ic, title, tips], i) => {
+        const hit = tips.filter((x) => !f || x.toLowerCase().includes(f) || title.toLowerCase().includes(f));
+        if (!hit.length) return; any = true;
+        const d = el('details'); d.open = !!f || i === (focus ?? 0);
+        const sm = el('summary'); sm.append(el('span', '', { text: ic }), el('span', '', { text: title }));
+        const ol = el('ol');
+        hit.forEach((x) => { const li = el('li'); li.innerHTML = f ? esc(x).replace(new RegExp(f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), (m) => `<mark>${m}</mark>`) : esc(x); ol.appendChild(li); });
+        d.append(sm, ol); body.appendChild(d);
+      });
+      if (!any) body.appendChild(el('p', '', { text: t('nothingFound') }));
+    };
+    q.addEventListener('input', render); render();
+    const foot = el('div', 'gfoot');
+    const a = el('a', '', { href: SITE, target: '_blank', rel: 'noopener', text: 'antarikfox.ru' });
+    foot.append(el('span', '', { text: `Antarikfox Glass ${AG.VERSION} · © ${new Date().getFullYear()} by Antarikfox` }), a);
+    box.append(head, q, body, foot);
+  });
+}
+$('guideBtn').textContent = t('guide'); $('guideBtn').addEventListener('click', () => openGuide());
+$('yr').textContent = new Date().getFullYear();
+(() => {
+  const all = guideFor().flatMap(([ic, , tips], si) => tips.map((x) => [ic, x, si]));
+  const line = $('tipline'); let k = Math.floor(Math.random() * all.length);
+  const show = () => { const [ic, x, si] = all[k % all.length]; line.style.opacity = '0'; setTimeout(() => { line.innerHTML = ''; const b = el('b', '', { text: `${ic} ${t('tip')}:` }); line.append(b, document.createTextNode(` ${x}`)); line.dataset.sec = si; line.style.opacity = '1'; }, 250); k++; };
+  line.style.cursor = 'pointer'; line.title = t('guide');
+  line.addEventListener('click', () => openGuide(Number(line.dataset.sec) || 0));
+  show(); setInterval(show, 20000);
+})();
+/* фон предпросмотра */
+(() => {
+  const bg = mkSelect([['theme', t('bgTheme')], ['dark', t('bgDark')], ['light', t('bgLight')], ['checker', t('bgChecker')]].map(([value, label]) => ({ value, label })),
+    (v) => { if (v === 'theme') delete $('stage').dataset.bg; else $('stage').dataset.bg = v; store.set('afx-studio-bg', v); }, { label: t('bg') });
+  const v0 = store.get('afx-studio-bg', 'theme'); bg.set(v0); if (v0 !== 'theme') $('stage').dataset.bg = v0;
+  $('bgBox').appendChild(bg.el);
+})();
+/* Ctrl+S — сохранить на панель */
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'ы' || e.code === 'KeyS')) { e.preventDefault(); const c = curCard(); if (c && c.placement) updateOnDash(); else publish(); }
+});
+$('pvw').addEventListener('input', (e) => { $('pv').style.setProperty('--pvw', `${e.target.value}px`); $('wVal').textContent = `${e.target.value}px`; });
+$('cp1').addEventListener('click', async () => { if (await copyText($('yaml').textContent)) toast(t('copied')); else { const r = document.createRange(); r.selectNodeContents($('yaml')); getSelection().removeAllRanges(); getSelection().addRange(r); toast(t('select')); } });
+$('cp2').addEventListener('click', () => toast(copyLegacy($('yaml').textContent) ? t('copied') : t('select')));
+$('dl').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([$('yaml').textContent], { type: 'text/yaml' }));
+  a.download = `${(curCard().name || 'card').replace(/[^\wа-яё-]+/gi, '_')}.yaml`;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+});
+$('pub').addEventListener('click', publish);
+$('stTog').textContent = t('stTog'); $('stTog').title = t('stTogT');
+$('stTog').addEventListener('click', () => { const e = mainEntity(curCard().config); if (!e || !states[e]) return; if (!simulate('homeassistant', 'toggle', { entity_id: e })) toast('—'); });
+if (window.top !== window.self) { const f = $('full'); f.hidden = false; f.title = t('full'); f.setAttribute('aria-label', t('full')); }
+
+$('ver').textContent = `v${STUDIO_VERSION} · card v${AG.VERSION}`;
+if (AG.VERSION !== STUDIO_VERSION) setTimeout(() => toast(lang === 'ru' ? `⚠ Загружена старая карточка v${AG.VERSION}. Замените antarikfox-glass-card.js в /config/www/` : `⚠ Old card v${AG.VERSION} loaded. Replace antarikfox-glass-card.js in /config/www/`), 600);
+setStatus('off', t('connecting'));
+hass = makeHass(); editor.hass = hass;
+selectCard(cur);
+connect();
+})();
+</script>
+</body>
+</html>
