@@ -29,14 +29,15 @@ jobs:
           VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
         shell: bash
         run: |
-          if gh release view v3.8.0 >/dev/null 2>&1; then
-            echo 'v3.8.0 already exists; leaving the release unchanged.'
+          if gh release view v4.0.1 >/dev/null 2>&1; then
+            echo 'v4.0.1 already exists; leaving the release unchanged.'
             exit 0
           fi
-          gh release create v3.8.0 \
+          gh release create v4.0.1 \
             --target "$VALIDATED_SHA" \
-            --title 'Antarikfox Studio 3.8.0' \
-            --notes-file CHANGELOG.md \
+            --title 'Antarikfox Studio 4.0.1' \
+            --notes-file docs/RELEASE-4.0.1.md \
             dist/antarikfox-glass-card.js \
             dist/antarikfox-studio.html \
-            dist/antarikfox_glass.yaml
+            dist/antarikfox_glass.yaml \
+            dist/antarikfox-favicon.png

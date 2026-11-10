@@ -15,11 +15,22 @@ ready-to-import dashboard; exact appearance depends on your card settings.*
 редакторе: настраивай стекло, цветные края, текстуры, фотографии и действия.
 Предпросмотр помогает подобрать оформление перед сохранением в Home Assistant.
 
-Includes **Antarikfox Glass Card 3.8.0**, the **Studio editor**, and an optional theme
+Includes **Antarikfox Glass Card 4.0.1**, the **Studio editor**, and an optional theme
 collection. Interface languages: **Русский · English · 中文 · 日本語**.
 
 [Install with HACS](#install-with-hacs) · [First card](#first-card) ·
 [Русское руководство](docs/GUIDE-RU.md)
+
+## New in 4.0.1
+
+- 10 additional layouts, 30 native instrument blocks, 20 looks and 20 animated textures.
+- Layered device graphics, interaction zones, materials and an X-ray view.
+- Single tap, double tap and hold actions; double tap does not execute the single-tap action first.
+- A fully transparent surface with a fine edge and whole-instrument scaling.
+- One language selector in Studio, an embedded glass-fox favicon and consistent full-screen navigation.
+- Photo uploads use only Home Assistant's authenticated Image Upload API. No File editor internal API, Supervisor ingress sessions or public photo-folder fallback.
+
+[Release notes](docs/RELEASE-4.0.1.md)
 
 ## Make every card your own
 
@@ -29,7 +40,7 @@ collection. Interface languages: **Русский · English · 中文 · 日本
 | Surface | Frost, carbon, hexagons, circuits and animated textures |
 | Content | Buttons, sliders, photos, cameras, graphs, media controls and nested groups |
 | Device states | Entity values, visibility rules and state-dependent photos |
-| Interaction | Tap actions and controls for your Home Assistant entities |
+| Interaction | Single tap, double tap, hold and device interaction zones |
 | Workflow | Visual editing, YAML import/export, local backups and storage dashboard saves |
 
 Use warm amber for lighting, cool cyan for network sensors, purple for climate,
@@ -122,7 +133,7 @@ embedded in a layout must be installed separately.
 ## Manual installation
 
 Copy all three files from `dist/` to `/config/www/` (put the theme in
-`/config/themes/` if needed). Register `/local/antarikfox-glass-card.js?v=3.8.0`
+`/config/themes/` if needed). Register `/local/antarikfox-glass-card.js?v=4.0.1`
 as a JavaScript module and open `/local/antarikfox-studio.html` from HA.
 
 ## Русская инструкция
@@ -133,6 +144,20 @@ as a JavaScript module and open `/local/antarikfox-studio.html` from HA.
 Studio открывается по адресу `/hacsfiles/Antarikfox-HA-card-Studio/antarikfox-studio.html`
 на том же сервере, где работает Home Assistant. Тема устанавливается отдельно
 копированием YAML — установка карточки через HACS сама тему не активирует.
+
+## Photo uploads
+
+Upload JPEG, PNG, GIF or another browser-decodable image from the editor. Still
+images are resized to 1200 px; WebP and other still formats are converted to PNG
+for the Home Assistant API, preserving transparency. JPEG stays JPEG and GIF is
+kept unchanged. Upload requires an authenticated Home Assistant connection.
+If it fails, the file is offered as a local download and the current image URL
+is kept. No server URL is invented for the downloaded file.
+
+Previously uploaded public-folder photos are not moved or deleted automatically.
+Re-upload personal photos through the editor, verify the new image URLs, then
+remove only the old photo files yourself if needed. Home Assistant manages the
+new image IDs and serving behavior; this is not a promise of authenticated reads.
 
 ## Privacy and security
 

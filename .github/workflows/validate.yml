@@ -23,3 +23,5 @@ jobs:
           node-version: '22'
       - run: node --check dist/antarikfox-glass-card.js
       - run: python3 scripts/check_package.py
+      - run: node tests/gestures.cjs
+      - run: node tests/upload-security.cjs

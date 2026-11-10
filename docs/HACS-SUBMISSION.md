@@ -8,7 +8,7 @@ Category: **plugin** (Dashboard). This is not a backend integration; hassfest an
 1. Create the repository with issues enabled; push these files to `main`.
 2. Set the description and topics above.
 3. Wait for **all** Validate jobs to pass, without ignored HACS checks.
-4. Create a full release `v3.8.0` after validation; attach all three `dist` files.
+4. Create a full release `v4.0.1` after validation; attach all three `dist` files.
 5. Add `Antarikfox/Antarikfox-HA-card-Studio` alphabetically to the JSON array in `plugin`
    on a new branch of the personal fork of `hacs/default`, based on upstream `master`.
 6. Use the current upstream PR template, include exact successful workflow run and
