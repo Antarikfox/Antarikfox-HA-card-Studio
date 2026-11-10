@@ -2,6 +2,10 @@
 
 **Your home. Your cards. Your style. · by Antarikfox**
 
+![Antarikfox Studio 4.0.1: live device card preview, animated glass and visual editor](docs/studio-4.0.1-screenshot.jpg)
+
+*Actual Studio 4.0.1 interface: a custom device card, live media controls, instrument blocks and the visual editor. Browser chrome cropped out.*
+
 Turn a familiar Home Assistant dashboard into your own glass control panel.
 Combine translucent surfaces, three-color edge lighting, animated textures and
 photos that change with your devices — then arrange the controls in the visual Studio.
