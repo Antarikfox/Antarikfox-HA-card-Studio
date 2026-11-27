@@ -1,8 +1,18 @@
 # Antarikfox Studio
 
+![Antarikfox Studio — promotional banner featuring the actual editor](docs/studio-banner.svg)
+
 **Your home. Your cards. Your style. · by Antarikfox**
 
 [![HACS Default](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/default/pull/13665)
+[![GitHub release](https://img.shields.io/github/v/release/Antarikfox/Antarikfox-HA-card-Studio?label=release&color=ef9c46)](https://github.com/Antarikfox/Antarikfox-HA-card-Studio/releases/latest)
+[![GitHub stars](https://img.shields.io/github/stars/Antarikfox/Antarikfox-HA-card-Studio?style=flat&color=efb34d)](https://github.com/Antarikfox/Antarikfox-HA-card-Studio/stargazers)
+[![Release asset downloads](https://img.shields.io/github/downloads/Antarikfox/Antarikfox-HA-card-Studio/total?label=release%20downloads&color=29a8ac)](https://github.com/Antarikfox/Antarikfox-HA-card-Studio/releases)
+[![MIT license](https://img.shields.io/badge/license-MIT-8492a6)](LICENSE)
+
+[![Open in HACS via My Home Assistant](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Antarikfox&repository=Antarikfox-HA-card-Studio&category=plugin)
+
+<sub>Download statistics count GitHub release assets, not unique HACS installations.</sub>
 
 ![Antarikfox Studio 4.0.1: live device card preview, animated glass and visual editor](docs/studio-4.0.1-screenshot.jpg)
 
@@ -26,6 +36,13 @@ collection. Interface languages: **Русский · English · 中文 · 日本
 
 [Install with HACS](#install-with-hacs) · [First card](#first-card) ·
 [Русское руководство](docs/GUIDE-RU.md)
+
+## Studio in motion
+
+![Animated 12-second Studio interface tour](docs/studio-interface-tour.svg)
+
+*A looping pan-and-zoom tour of the actual Studio 4.0.1 screenshot, not a recording of live interactions.*
+[Open the animated tour directly](docs/studio-interface-tour.svg) if the README preview is static.
 
 ## New in 4.0.1
 
@@ -65,9 +82,8 @@ or choose your own palette for each card.
 
 Antarikfox Studio has been accepted into the [HACS default catalog](https://github.com/hacs/default/pull/13665).
 
-1. Open HACS in Home Assistant.
-2. Search for **Antarikfox Studio** in the **Dashboard** category.
-3. Open the repository and select **Download**.
+1. Use the **My Home Assistant** button above to open the repository in HACS, or open HACS and search for **Antarikfox Studio** in the **Dashboard** category.
+2. Open the repository and select **Download**.
 
 If it is not listed yet, allow the HACS catalog to refresh. As a fallback, add
 `https://github.com/Antarikfox/Antarikfox-HA-card-Studio` as a **Dashboard** custom repository.
