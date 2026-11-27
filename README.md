@@ -207,3 +207,16 @@ Studio requests confirmation when enabling it. Dashboard saves modify HA configu
 with browser and HA versions, reproduction steps and a redacted configuration.
 
 MIT © 2026 Antarikfox · [antarikfox.ru](https://antarikfox.ru)
+
+## Antarikfox Design Lab 🦊
+
+Independent Home Assistant community projects by Antarikfox. All four repositories are listed in the default HACS catalog.
+
+| Project | What it does |
+| --- | --- |
+| **Antarikfox Studio (this project)** | Visual dashboard and glass card designer |
+| [OBSIDIAN-6](https://github.com/Antarikfox/obsidian-6-card) | Six-tube biomechanical Nixie clock |
+| [CHRONO / 03 BIO](https://github.com/Antarikfox/antarikfox-chrono-bio-clock) | Mecha clock with amber digits and moss |
+| [TITAN HATCH](https://github.com/Antarikfox/titan-climate-card) | Climate telemetry and 24-hour graphs |
+
+[Explore Antarikfox on GitHub](https://github.com/Antarikfox) · [HACS default catalog](https://github.com/hacs/default/blob/master/plugin)
