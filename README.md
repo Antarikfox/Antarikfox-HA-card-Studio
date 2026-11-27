@@ -2,6 +2,8 @@
 
 **Your home. Your cards. Your style. · by Antarikfox**
 
+[![HACS Default](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/default/pull/13665)
+
 ![Antarikfox Studio 4.0.1: live device card preview, animated glass and visual editor](docs/studio-4.0.1-screenshot.jpg)
 
 *Actual Studio 4.0.1 interface: a custom device card, live media controls, instrument blocks and the visual editor. Browser chrome cropped out.*
@@ -61,9 +63,14 @@ or choose your own palette for each card.
 
 ## Install with HACS
 
-Until the catalog submission is accepted, add
-`https://github.com/Antarikfox/Antarikfox-HA-card-Studio` as a **Dashboard** custom repository
-in HACS, then download **Antarikfox Studio**.
+Antarikfox Studio has been accepted into the [HACS default catalog](https://github.com/hacs/default/pull/13665).
+
+1. Open HACS in Home Assistant.
+2. Search for **Antarikfox Studio** in the **Dashboard** category.
+3. Open the repository and select **Download**.
+
+If it is not listed yet, allow the HACS catalog to refresh. As a fallback, add
+`https://github.com/Antarikfox/Antarikfox-HA-card-Studio` as a **Dashboard** custom repository.
 
 The `dist` directory contains all installation files; keep the HTML and JS together.
 If HACS has not registered the resource automatically, add this JavaScript module
@@ -144,7 +151,9 @@ as a JavaScript module and open `/local/antarikfox-studio.html` from HA.
 
 [Полное руководство, настройки и примеры](docs/GUIDE-RU.md).
 
-Через HACS добавляй репозиторий в категории **«Панель / Dashboard»**.
+Antarikfox Studio принят в стандартный каталог HACS. Найди **Antarikfox Studio**
+в категории **«Панель / Dashboard»** и нажми «Скачать». Если карточка ещё не
+появилась, дождись обновления каталога HACS или временно добавь репозиторий вручную.
 Studio открывается по адресу `/hacsfiles/Antarikfox-HA-card-Studio/antarikfox-studio.html`
 на том же сервере, где работает Home Assistant. Тема устанавливается отдельно
 копированием YAML — установка карточки через HACS сама тему не активирует.
