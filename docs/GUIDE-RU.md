@@ -1,6 +1,6 @@
 > Установка через HACS и актуальные пути: см. [README](../README.md). Пути `/local/` ниже относятся к ручной установке.
 
-# Antarikfox Glass 4.0.1 для Home Assistant
+# Antarikfox Glass 4.0.5 для Home Assistant
 
 **by Antarikfox · [antarikfox.ru](https://antarikfox.ru)**
 
@@ -10,10 +10,14 @@
 
 1. `themes/antarikfox_glass.yaml` → `/config/themes/`, в `configuration.yaml`: `frontend: themes: !include_dir_merge_named themes`, затем `frontend.reload_themes`.
 2. `www/antarikfox-glass-card.js` → `/config/www/`.
-3. Ресурс `/local/antarikfox-glass-card.js?v=4.0.1`, тип **«JavaScript-модуль»**.
+3. Ресурс `/local/antarikfox-glass-card.js?v=4.0.5`, тип **«JavaScript-модуль»**.
 4. Для исправления заголовков и кантов на обычных карточках нужен **card-mod** (HACS).
 
 Конфигурации v1 и v2 работают без изменений.
+
+## Что нового в 4.0.5
+
+См. [описание обновления 4.0.5](RELEASE-4.0.5.md): импорт карточек, исходный YAML, фотографии и предпросмотр.
 
 ## Что нового в 4.0.1
 
@@ -469,3 +473,4 @@ fx: [pollen, rays]
 card: { type: tile, entity: light.living_room }
 ```
 Every option and the full effects list are shown above. Effect keys are the same in both languages.
+
