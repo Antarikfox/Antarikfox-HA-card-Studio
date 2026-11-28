@@ -1,12 +1,12 @@
 /*!
- * Antarikfox Glass Card v3 — стеклянная обёртка для карточек Home Assistant
+ * Antarikfox Glass Card v4.0.5 — стеклянная обёртка для карточек Home Assistant
  * Трёхцветное свечение, блики, живые текстуры, 49 спецэффектов, события, RU/EN/中文/日本語.
  * 3.9: проверка состояний, обратная связь, прибор со слоями и зонами, рентген, материалы.
- * by Antarikfox · v4.0.1
+ * by Antarikfox · v4.0.5
  */
 (() => {
   'use strict';
-  const VERSION = '4.0.1';
+  const VERSION = '4.0.5';
   const TAG = 'antarikfox-glass-card';
   const SHELL = 'afx-glass-shell';
   const EDITOR = `${TAG}-editor`;
@@ -3018,8 +3018,12 @@
       for (const b of blocks || []) {
         if (!b || typeof b !== 'object') continue;
         if (b.entity) out.add(b.entity);
+        else if (b.type === 'image' && this.shell._cfg?.entity) out.add(this.shell._cfg.entity);
         (b.entities || []).forEach((x) => out.add(typeof x === 'string' ? x : x && x.entity));
         (b.items || []).forEach((x) => x && x.entity && out.add(x.entity));
+        if (b.type === 'card' && b.card?.type) {
+          try { analyzeCard(b.card).entities.forEach((id) => out.add(id)); } catch (e) { /* malformed embedded config */ }
+        }
         if (b.blocks) this.ids(b.blocks, out);
         (b.layers || []).forEach((x) => { if (x && x.entity) out.add(x.entity); if (x && x.rot_entity) out.add(x.rot_entity); });
         (b.zones || []).forEach((z) => { if (!z) return; if (z.entity) out.add(z.entity); if (typeof z.text === 'string') (z.text.match(/[a-z_]+\.[a-z0-9_]+(?=[}:])/g) || []).forEach((id) => out.add(id)); });
@@ -3038,6 +3042,8 @@
     changed(h) {
       if (!h || !h.states || !this._ids) return false;
       let ch = false;
+      let imageBase = ''; try { imageBase = h.hassUrl ? h.hassUrl('/') : ''; } catch (e) { /* no URL provider */ }
+      if (imageBase !== this._imageBase) { this._imageBase = imageBase; ch = true; }
       for (const id of this._ids) { const s = h.states[id]; if (s !== this.last[id]) { this.last[id] = s; ch = true; } }
       return ch;
     }
@@ -3072,6 +3078,13 @@
     }
   }
 
+  const imageURL = (value, hass) => {
+    const url = String(value || '').trim();
+    if (url.startsWith('/') && !url.startsWith('//') && hass && typeof hass.hassUrl === 'function') {
+      try { return hass.hassUrl(url); } catch (e) { /* keep the original URL */ }
+    }
+    return url;
+  };
   const NB = {
     title(r, b) {
       const w = el('div', `nb-title al-${b.align || 'left'} sz-${b.size || 'm'}`);
@@ -3095,30 +3108,36 @@
       if (hMode === 'fixed') w.style.height = px(num(b.height, 180));
       else if (hMode === 'fill') { w.style.flex = '1 1 auto'; w.style.minHeight = '80px'; }
       else w.style.aspectRatio = '4 / 3';
-      w.style.setProperty('--fit', b.fit || 'cover');
+      w.style.setProperty('--fit', b.fit || (hMode === 'auto' ? 'contain' : 'cover'));
       if (b.position) w.style.setProperty('--pos', b.position);
       const A = el('img'), B = el('img'), glowEl = el('i', 'glowov');
+      const error = el('div', 'nb-img-error', { role: 'status' }); error.hidden = true;
+      error.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:12px;font:12px system-ui;color:#ffb39d;background:rgba(20,15,15,.85);pointer-events:none';
+      const showError = () => { error.hidden = false; error.style.display = 'flex'; error.textContent = r.lang === 'ru' ? 'Фото не загрузилось. Проверь адрес изображения и доступ к HA.' : 'Image failed to load. Check its URL and access to HA.'; };
+      [A, B].forEach((x) => { x.addEventListener('error', showError); x.addEventListener('load', () => { error.hidden = true; error.style.display = 'none'; }); });
+      error.style.display = 'none';
       [A, B].forEach((x) => {
         x.decoding = 'async'; x.draggable = false;
-        x.addEventListener('load', () => { if (hMode === 'auto' && x.naturalWidth && x.style.opacity !== '0') w.style.aspectRatio = `${x.naturalWidth} / ${x.naturalHeight}`; });
+        x.addEventListener('load', () => { if (hMode === 'auto' && x.naturalWidth && x.naturalHeight && x.style.opacity !== '0') w.style.aspectRatio = `${x.naturalWidth} / ${x.naturalHeight}`; });
       });
       B.style.opacity = '0';
-      w.append(A, B, glowEl);
+      w.append(A, B, glowEl, error);
       /* заранее подгружаем все фото состояний: переключение без задержки */
-      [b.image, ...Object.values(b.state_images || {})].filter((u) => typeof u === 'string' && u && !u.includes('{')).forEach((u) => { const im = new Image(); im.decoding = 'async'; im.src = u; });
+      [b.image, ...Object.values(b.state_images || {})].filter((u) => typeof u === 'string' && u && !u.includes('{')).forEach((u) => { const im = new Image(); im.decoding = 'async'; im.src = imageURL(u, r.hass()); });
       let front = A, back = B, cur = null, opt = null, optBase = null, optUntil = 0;
       const pick = (so, st) => {
-        const si = b.state_images || {};
+        const si = b.state_images || b.state_image || {};
         let src = b.image || '';
+        if (!so && !src) src = si.off || si.on || Object.values(si).find((v) => typeof v === 'string' && v) || '';
         if (so) {
           const bySt = si[st] ?? si[INACTIVE.has(st) ? 'off' : 'on'];
           if (!isNil(bySt) && bySt !== '') src = bySt;
           else if (b.use_entity_picture && so.attributes.entity_picture) src = so.attributes.entity_picture;
         }
-        return r.tpl(String(src || ''));
+        return imageURL(r.tpl(String(src || '')), r.hass());
       };
       r.up(() => {
-        const so = r.so(b.entity);
+        const so = r.so(b.entity || (r.shell._cfg || {}).entity);
         let st = so ? so.state : '';
         if (opt !== null) { if (so && so.state === optBase && Date.now() < optUntil) st = opt; else opt = null; }
         const on = !!so && !INACTIVE.has(st);
@@ -3127,6 +3146,7 @@
         [A, B].forEach((x) => { x.alt = alt; });
         const src = pick(so, st);
         if (src === cur) return;
+        error.hidden = true; error.style.display = 'none';
         const first = cur === null;
         cur = src;
         w.classList.toggle('empty', !src);
@@ -3134,13 +3154,13 @@
         front.style.visibility = ''; back.style.visibility = '';
         if (first || !front.getAttribute('src')) { front.src = src; front.style.opacity = '1'; back.style.opacity = '0'; return; }
         const f = front, bk = back;
-        bk.onload = () => { bk.style.opacity = '1'; f.style.opacity = '0'; front = bk; back = f; if (hMode === 'auto' && bk.naturalWidth) w.style.aspectRatio = `${bk.naturalWidth} / ${bk.naturalHeight}`; };
+        bk.onload = () => { bk.style.opacity = '1'; f.style.opacity = '0'; front = bk; back = f; if (hMode === 'auto' && bk.naturalWidth && bk.naturalHeight) w.style.aspectRatio = `${bk.naturalWidth} / ${bk.naturalHeight}`; };
         bk.onerror = () => { f.src = src; };
         bk.src = src;
       });
       /* мгновенная смена фото при нажатии, не дожидаясь ответа устройства */
-      r.act(w, b, b.entity, 'auto', (a) => {
-        const so = r.so(b.entity);
+      r.act(w, b, b.entity || (r.shell._cfg || {}).entity, 'auto', (a) => {
+        const so = r.so(b.entity || (r.shell._cfg || {}).entity);
         if (!so || (a && a.confirmation)) return;
         const act = (a && a.action) || 'auto';
         if (!(act === 'toggle' || (act === 'auto' && TOGGLE_DOMAINS.has(dom(b.entity))))) return;
@@ -3291,7 +3311,7 @@
         const so = r.so(b.entity), a = (so && so.attributes) || {};
         t.textContent = a.media_title || (so ? r.name(so) : '—');
         s.textContent = a.media_artist || (so ? r.stateText(so) : '');
-        art.style.backgroundImage = a.entity_picture ? `url(${JSON.stringify(a.entity_picture)})` : '';
+        art.style.backgroundImage = a.entity_picture ? `url(${JSON.stringify(imageURL(a.entity_picture, r.hass()))})` : '';
         art.classList.toggle('noart', !a.entity_picture);
         pp.classList.toggle('on', !!so && so.state === 'playing');
       });
@@ -3318,7 +3338,7 @@
     camera(r, b) {
       const w = el('div', 'nb-img nb-cam');
       w.style.height = px(num(b.height, 200));
-      w.style.setProperty('--fit', b.fit || 'cover');
+      w.style.setProperty('--fit', b.fit || (hMode === 'auto' ? 'contain' : 'cover'));
       const img = el('img', '', { alt: '' });
       const badge = el('span', 'live', { text: '● LIVE' });
       w.append(img, badge);
@@ -3404,7 +3424,13 @@
           w.appendChild(c);
           r.up((hh) => { c.hass = hh; });
         }).catch(() => { w.textContent = String(b.card.type || ''); });
-      } else w.appendChild(el('div', 'nb-ph', { text: `⧉ ${b.card.type || 'card'}${b.card.entity ? ` · ${b.card.entity}` : ''}` }));
+      } else {
+        const bubble = bubbleMediaBlocks(b.card);
+        if (bubble) { bubble.forEach((block) => w.appendChild(r.block(block))); return w; }
+        const im = extractImages(b.card);
+        if (im.count) w.appendChild(NB.image(r, { ...mkImage(b.card, im), tap_action: { action: 'none' }, double_tap_action: { action: 'none' }, hold_action: { action: 'none' } }));
+        w.appendChild(el('div', 'nb-ph', { text: `⧉ ${b.card.type || 'card'} — ${tr(r.lang, 'ui', 'haCardHere')}` }));
+      }
       return w;
     },
   };
@@ -5501,9 +5527,10 @@ ${V40_CSS}`;
       let el;
       try {
         if (typeof window.loadCardHelpers !== 'function') {
-          el = document.createElement('div');
-          el.style.cssText = 'padding:16px;font-size:13px;opacity:.75;border:1px dashed rgba(255,255,255,.25);border-radius:14px;margin:12px';
-          el.textContent = `⧉ ${conf.type || 'card'}${conf.entity ? ` · ${conf.entity}` : ''} — ${tr(detectLang(this._hass), 'ui', 'haCardHere') || 'this HA card renders inside Home Assistant'}`;
+          // Root-level legacy card wrappers need the same native preview as imported blocks.
+          const converted = convertCard(conf, { mode: 'rebuild', strip: false, colors: false, effects: false, hass: this._hass });
+          el = new AntarikfoxGlassCard();
+          el.setConfig({ ...converted.config, type: `custom:${TAG}`, bare: true });
         } else {
           const helpers = await window.loadCardHelpers();
           if (token !== this._token) return;
@@ -5735,9 +5762,26 @@ ${V40_CSS}`;
   };
 
   /* ── Фото: основное и по состояниям, чтобы при нажатии они менялись как раньше ── */
-  const URL_RE = /url\(\s*['"]?([^'")]+)['"]?\s*\)/i;
-  const urlOf = (v) => { if (typeof v !== 'string') return null; const m = URL_RE.exec(v); if (m) return m[1]; return /^(\/|https?:|data:image)/.test(v.trim()) && !/\s/.test(v.trim()) ? v.trim() : null; };
+  const staticCSSImages = (css) => {
+    if (typeof css !== 'string') return [];
+    // Accept literal image URLs only, never JS concatenations such as url("' + pic + '").
+    const urls = [], re = /url\(\s*(?:"([^"\n]*)"|'([^'\n]*)'|([^'"\s][^)]*?))\s*\)/gi;
+    const text = css.replace(/\/\*[\s\S]*?\*\//g, '');
+    let m;
+    while ((m = re.exec(text))) {
+      const value = (m[1] ?? m[2] ?? m[3] ?? '').trim();
+      if (/^(?:\/|https?:\/\/|data:image\/|\.{1,2}\/)/i.test(value) && !/\$\{|\{\{|\[\[\[|[<>`]/.test(value)) urls.push(value);
+    }
+    return [...new Set(urls)];
+  };
+  const urlOf = (v) => {
+    if (typeof v !== 'string') return null;
+    const value = v.trim();
+    if (/^(\/|https?:|data:image|\.{1,2}\/)/.test(value) && !/\s|\$\{|\{\{|\[\[\[/.test(value)) return value;
+    return staticCSSImages(value)[0] || null;
+  };
   const imageFromStyles = (styles) => {
+    if (typeof styles === 'string') return staticCSSImages(styles)[0] || null;
     let found = null;
     const scan = (arr) => (Array.isArray(arr) ? arr : []).forEach((rule) => { if (rule && typeof rule === 'object') Object.entries(rule).forEach(([k, v]) => { if (/background/.test(k) && !found) found = urlOf(v); }); });
     if (styles && typeof styles === 'object') { scan(styles.card); scan(styles.img_cell); scan(styles.entity_picture); }
@@ -5747,8 +5791,8 @@ ${V40_CSS}`;
     const res = { image: null, states: {}, count: 0 };
     if (!c || typeof c !== 'object') return res;
     res.image = urlOf(c.image) || urlOf(c.entity_picture) || urlOf(c.picture) || imageFromStyles(c.styles);
-    if (!res.image && c.card_mod && typeof c.card_mod.style === 'string') res.image = urlOf(c.card_mod.style);
-    if (c.state_image && typeof c.state_image === 'object') Object.entries(c.state_image).forEach(([st, u]) => { const x = urlOf(u); if (x) res.states[String(st)] = x; });
+    if (!res.image && c.card_mod && typeof c.card_mod.style === 'string') res.image = staticCSSImages(c.card_mod.style)[0] || null;
+    if ((c.state_images || c.state_image) && typeof (c.state_images || c.state_image) === 'object') Object.entries(c.state_images || c.state_image).forEach(([st, u]) => { const x = urlOf(u); if (x) res.states[String(st)] = x; });
     if (Array.isArray(c.state)) c.state.forEach((st) => {
       if (!st || isNil(st.value)) return;
       const x = urlOf(st.entity_picture) || imageFromStyles(st.styles);
@@ -5757,31 +5801,72 @@ ${V40_CSS}`;
     res.count = (res.image ? 1 : 0) + Object.keys(res.states).length;
     return res;
   };
-  const hasTemplate = (c) => /\{\{|\{%|\[\[\[/.test(JSON.stringify(c));
+  /** Static inspection only: never evaluates card templates or loads image URLs. */
+  const analyzeCard = (input) => {
+    const src = typeof input === 'string' ? YAML.parse(input) : input;
+    if (!src || typeof src !== 'object' || Array.isArray(src) || !src.type) throw new Error('not-a-card');
+    const images = new Set(), entities = new Set(), texts = [], types = new Set();
+    const visit = (node) => {
+      if (!node || typeof node !== 'object') return;
+      if (Array.isArray(node)) { node.forEach(visit); return; }
+      if (node.type) types.add(String(node.type));
+      const im = extractImages(node);
+      [im.image, ...Object.values(im.states), ...staticCSSImages(node.styles), ...staticCSSImages(node.card_mod?.style)].filter(Boolean).forEach((u) => images.add(u));
+      Object.entries(node).forEach(([key, value]) => {
+        if (typeof value === 'string') {
+          if (/^(entity|entity_id)$/.test(key)) (value.match(ENTITY_RE) || []).forEach((id) => entities.add(id));
+          if (/^(text|title|name|heading|label|content|subtitle)$/.test(key) && value.trim()) texts.push(value);
+        } else visit(value);
+      });
+    };
+    visit(src);
+    walk(src, (value, path) => { if (/entity|entities/.test(path)) (value.match(ENTITY_RE) || []).forEach((id) => entities.add(id)); });
+    return { type: src.type, images: [...images], entities: [...entities], texts: [...new Set(texts)], types: [...types] };
+  };
+  const hasTemplate = (c) => /\$\{|\{\{|\{%|\[\[\[/.test(JSON.stringify(c));
   const mkImage = (c, imgs, extra = {}) => (imgs.count ? {
     type: 'image', entity: c.entity, image: imgs.image || undefined,
     state_images: Object.keys(imgs.states).length ? imgs.states : undefined,
-    height: 180, fit: c.type === 'picture-entity' || c.type === 'picture' ? 'cover' : 'contain',
+    height: 'auto', fit: 'contain',
     tap_action: c.tap_action, double_tap_action: c.double_tap_action, hold_action: c.hold_action, ...extra,
   } : null);
-  const clean = (o) => JSON.parse(JSON.stringify(o, (k, v) => (v === undefined || v === null ? undefined : v)));
+  // A native equivalent for the basic Bubble media player. Original YAML stays in Studio.
+  // CSS templates are intentionally not executed: the media block reads live artwork from hass.
+  const bubbleMediaBlocks = (c) => {
+    if (c.type !== 'custom:bubble-card' || c.card_type !== 'media-player' || !c.entity || c.sub_button || c.modules) return null;
+    const image = mkImage(c, extractImages(c), { height: 'auto', fit: 'contain' });
+    return [
+      { type: 'title', entity: c.entity, text: c.name, size: 's' },
+      image,
+      { type: 'media', entity: c.entity },
+      c.hide?.volume_slider === true ? null : { type: 'slider', entity: c.entity, name: '' },
+    ].filter(Boolean);
+  };
+  const clean = (o) => JSON.parse(JSON.stringify(o));
   /** Раскладывает карточку на «предметы» конструктора. Шаблоны и неизвестные типы сохраняются как вставка исходной карточки. */
   const buildBlocks = (c, counter) => {
     if (!c || typeof c !== 'object') return [];
     const T = String(c.type || ''), ent = c.entity, name = c.name ?? c.title;
     const imgs = extractImages(c);
+    if (!imgs.count && c.entity && counter.hass && (c.type === 'picture-entity' || c.show_entity_picture === true)) {
+      imgs.image = urlOf(counter.hass.states?.[c.entity]?.attributes?.entity_picture);
+      imgs.count = imgs.image ? 1 : 0;
+    }
     counter.images += imgs.count;
     if (Object.keys(imgs.states).length) counter.states.push(...Object.keys(imgs.states));
-    const keep = () => { counter.kept++; return [{ type: 'card', card: cleanCard(c, counter) }]; };
+    const keep = () => { counter.kept++; return [{ type: 'card', card: counter.strip === false ? clean(c) : cleanCard(c, counter) }]; };
     if (T === 'vertical-stack') return (c.cards || []).flatMap((x) => buildBlocks(x, counter));
     if (T === 'horizontal-stack') return [{ type: 'row', blocks: (c.cards || []).map((x) => { const b = buildBlocks(x, counter); return b.length === 1 ? b[0] : { type: 'column', blocks: b }; }) }];
+    const bubble = bubbleMediaBlocks(c);
+    if (bubble) return bubble;
     if (hasTemplate(c)) {
       const im = mkImage(c, imgs);
-      if (im && T === 'custom:button-card') { counter.kept++; return [im, { type: 'card', card: cleanCard({ ...c, styles: { ...(c.styles || {}), card: [] } }, counter) }]; }
+      if (im && T === 'custom:button-card' && counter.strip !== false) { counter.kept++; return [im, { type: 'card', card: cleanCard({ ...c, styles: { ...(c.styles || {}), card: [] } }, counter) }]; }
       return keep();
     }
     const title = name ? { type: 'title', text: name, entity: undefined } : null;
     switch (T) {
+      case 'heading': return [{ type: 'title', text: c.heading || name || '', icon: c.icon }];
       case 'picture': return [mkImage(c, imgs)].filter(Boolean);
       case 'picture-entity': return [mkImage(c, imgs), c.show_name !== false || c.show_state !== false ? { type: 'title', entity: ent, text: name, size: 's', subtitle: c.show_state === false ? '' : undefined } : null].filter(Boolean);
       case 'picture-glance': return [mkImage(c, imgs), title, { type: 'chips', entities: (c.entities || []).map((x) => (typeof x === 'string' ? x : { entity: x.entity, icon: x.icon, tap_action: x.tap_action })) }].filter(Boolean);
@@ -5818,7 +5903,10 @@ ${V40_CSS}`;
     const o = { strip: true, colors: true, effects: true, ...opts };
     const src = typeof input === 'string' ? YAML.parse(input) : input;
     if (!src || typeof src !== 'object' || Array.isArray(src) || !src.type) throw new Error('not-a-card');
-    if (src.type === `custom:${TAG}`) return { config: src, report: [['already', '']] };
+    if (src.type === `custom:${TAG}`) {
+      const a = analyzeCard(src);
+      return { config: clean(src), report: [['already', ''], ['type', src.type], ['entities', String(a.entities.length)], ['images', String(a.images.length)]] };
+    }
     const report = [];
     report.push(['type', String(src.type || '?')]);
 
@@ -5854,6 +5942,7 @@ ${V40_CSS}`;
     });
 
     const style = {};
+    ['grid_options', 'view_layout', 'visibility'].forEach((key) => { if (src[key] !== undefined) style[key] = clean(src[key]); });
     const fx = o.effects && domain && DOMAIN_FX[domain] ? DOMAIN_FX[domain] : null;
     if (o.colors && pick.length) {
       const cols = pick.length === 3 ? pick.map((p) => p.hex) : pick.length === 2 ? [pick[0].hex, toHex(mixRgb(parseColor(pick[0].hex), parseColor(pick[1].hex), 0.5)), pick[1].hex] : triadFromRgb(parseColor(pick[0].hex)).map(toHex);
@@ -5880,7 +5969,7 @@ ${V40_CSS}`;
       if (unitHint) { style.progress_entity = main; report.push(['progress', main]); }
     }
 
-    const counter = { n: 0, img: 0, images: 0, states: [], kept: 0 };
+    const counter = { n: 0, img: 0, images: 0, states: [], kept: 0, strip: o.strip, hass: o.hass };
     if (o.mode === 'rebuild') {
       const blocks = clean(buildBlocks(src, counter));
       report.push(['rebuilt', String(blocks.length)]);
@@ -7386,6 +7475,10 @@ button{font:inherit;color:inherit}
       this._sync(); this._fire();
     }
 
+    setImportSource(source) {
+      this._importSource = source ? (typeof source === 'string' ? source : YAML.dump(source)) : '';
+    }
+
     openImport() {
       const b = this.shadowRoot.querySelector('.tb[data-d=importCard]');
       if (b && this._drawer !== 'importCard') b.click();
@@ -7452,6 +7545,8 @@ button{font:inherit;color:inherit}
       } else if (mode === 'importCard') {
         const ta = el('textarea', 'in ta', { spellcheck: 'false', 'aria-label': T('ui', 'importCard') });
         ta.placeholder = T('ui', 'importHint'); ta.style.minHeight = '170px';
+        ta.value = this._importSource || '';
+        ta.addEventListener('input', () => { this._importSource = ta.value; });
         const o = { strip: true, colors: true, effects: true, mode: 'wrap' };
         const ms = new UISelect(this, { label: T('ui', 'modeWrap'), options: [{ value: 'wrap', label: `🫙 ${T('ui', 'modeWrap')}` }, { value: 'rebuild', label: `🧱 ${T('ui', 'modeRebuild')}` }], onChange: (v) => { o.mode = v; } });
         ms.set('wrap');
@@ -7467,7 +7562,8 @@ button{font:inherit;color:inherit}
         go.addEventListener('click', () => {
           out.textContent = '';
           try {
-            const { config, report } = convertCard(ta.value, o);
+            const { config, report } = convertCard(ta.value, { ...o, hass: this._hass });
+            this._importSource = ta.value;
             this._record();
             this._config = { ...config, type: this._config.type || config.type };
             this._bOpen = new Set();
@@ -8402,7 +8498,7 @@ button{font:inherit;color:inherit}
   }
   FontLoader.watchTheme();
   GlobalFix.init();
-  window.AntarikfoxGlass = { VERSION, INSTRUMENTS40, LAYOUT_DATA40, TEX_DATA40, LOOK_DATA40, Sim, AFX_MATS, MAT_BALL, zoneBox, DOMAIN_EMOJI, MDI_EMOJI, YAML, convertCard, GlobalFix, ui: { EDITOR_CSS, UISelect, UIEntity, UISwitch, UIInput, copyText, copyLegacy, el }, autoLayout, LAYOUTS, LOOKS, FONTS, FX_GROUPS, EVENT_FX, Scheduler, PRESETS, TEXTURES, CANVAS_TEXTURES, TEXTURE_KEYS, FX_KEYS, FX_ICONS, DEFAULTS, BEHAVIOR_KEYS, DEFAULT_TRUE, I18N, detectLang, tr, harmony };
+  window.AntarikfoxGlass = { VERSION, INSTRUMENTS40, LAYOUT_DATA40, TEX_DATA40, LOOK_DATA40, Sim, AFX_MATS, MAT_BALL, zoneBox, DOMAIN_EMOJI, MDI_EMOJI, YAML, convertCard, analyzeCard, GlobalFix, ui: { EDITOR_CSS, UISelect, UIEntity, UISwitch, UIInput, copyText, copyLegacy, el }, autoLayout, LAYOUTS, LOOKS, FONTS, FX_GROUPS, EVENT_FX, Scheduler, PRESETS, TEXTURES, CANVAS_TEXTURES, TEXTURE_KEYS, FX_KEYS, FX_ICONS, DEFAULTS, BEHAVIOR_KEYS, DEFAULT_TRUE, I18N, detectLang, tr, harmony };
 
   console.info(
     `%c ANTARIKFOX GLASS %c v${VERSION} %c by Antarikfox · https://antarikfox.ru `,
