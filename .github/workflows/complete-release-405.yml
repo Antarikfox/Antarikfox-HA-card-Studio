@@ -1,0 +1,34 @@
+name: Complete release 4.0.5 assets
+on:
+  push:
+    branches: ['maintenance/release-assets-4.0.5']
+    paths: ['.github/workflows/complete-release-405.yml']
+permissions:
+  contents: write
+jobs:
+  complete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v4.0.5
+          persist-credentials: false
+      - name: Attach exact tagged distribution and set title
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(git hash-object dist/antarikfox-glass-card.js)" = "4bfbb4fc5153b46cd983bf54ccfc1fda0b399aa5"
+          test "$(git hash-object dist/antarikfox-studio.html)" = "b56df6669c2e4999d7a839e2f09245bd4b398795"
+          test "$(git hash-object dist/antarikfox-favicon.png)" = "9d5c75f5b97a57fbd4cad220e91836fbb370f7bd"
+          test "$(git hash-object dist/antarikfox_glass.yaml)" = "a6d344d5838855a45c150ed6443cda8b884049e7"
+          gh release view v4.0.5 --json assets --jq '.assets[].name' > /tmp/afx-assets.txt
+          for file in dist/antarikfox-glass-card.js dist/antarikfox-studio.html dist/antarikfox-favicon.png dist/antarikfox_glass.yaml; do
+            if ! grep -Fxq "$(basename "$file")" /tmp/afx-assets.txt; then
+              gh release upload v4.0.5 "$file"
+            fi
+          done
+          gh release edit v4.0.5 --title "Antarikfox Studio 4.0.5"
+          gh release view v4.0.5 --json name,tagName,assets
