@@ -31,7 +31,7 @@ ready-to-import dashboard; exact appearance depends on your card settings.*
 редакторе: настраивай стекло, цветные края, текстуры, фотографии и действия.
 Предпросмотр помогает подобрать оформление перед сохранением в Home Assistant.
 
-Includes **Antarikfox Glass Card 4.0.1**, the **Studio editor**, and an optional theme
+Includes **Antarikfox Glass Card 4.0.5**, the **Studio editor**, and an optional theme
 collection. Interface languages: **Русский · English · 中文 · 日本語**.
 
 [Install with HACS](#install-with-hacs) · [First card](#first-card) ·
@@ -44,7 +44,17 @@ collection. Interface languages: **Русский · English · 中文 · 日本
 *A looping pan-and-zoom tour of the actual Studio 4.0.1 screenshot, not a recording of live interactions.*
 [Open the animated tour directly](docs/studio-interface-tour.svg) if the README preview is static.
 
-## New in 4.0.1
+## New in 4.0.5
+
+- Import existing dashboard cards with static analysis of images, text and entities, while retaining the original YAML.
+- Improved image previews, state-dependent photos, relative Home Assistant image URLs and automatic aspect ratios.
+- Native previews for basic Bubble Card media players; same-origin Studio can use Home Assistant card helpers.
+- Improved dashboard picker scrolling and protection against stale asynchronous selections.
+- Card conversion preserves dashboard layout and visibility settings; dynamic CSS templates are not executed during static analysis.
+
+[Full 4.0.5 release notes](docs/RELEASE-4.0.5.md)
+
+## Highlights from 4.0.1
 
 - 10 additional layouts, 30 native instrument blocks, 20 looks and 20 animated textures.
 - Layered device graphics, interaction zones, materials and an X-ray view.
@@ -160,7 +170,7 @@ embedded in a layout must be installed separately.
 ## Manual installation
 
 Copy all three files from `dist/` to `/config/www/` (put the theme in
-`/config/themes/` if needed). Register `/local/antarikfox-glass-card.js?v=4.0.1`
+`/config/themes/` if needed). Register `/local/antarikfox-glass-card.js?v=4.0.5`
 as a JavaScript module and open `/local/antarikfox-studio.html` from HA.
 
 ## Русская инструкция
@@ -220,3 +230,4 @@ Independent Home Assistant community projects by Antarikfox. All four repositori
 | [TITAN HATCH](https://github.com/Antarikfox/titan-climate-card) | Climate telemetry and 24-hour graphs |
 
 [Explore Antarikfox on GitHub](https://github.com/Antarikfox) · [HACS default catalog](https://github.com/hacs/default/blob/master/plugin)
+
