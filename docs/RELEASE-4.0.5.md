@@ -2,6 +2,10 @@
 
 **by Antarikfox · antarikfox.ru**
 
+![11 standard Home Assistant cards rebuilt with Antarikfox Glass 4.0.5](studio-4.0.5-dashboard.png)
+
+Actual Glass Card renderer with demonstration entity states; the surrounding dashboard layout is a standalone documentation preview. / Реальный рендер карточек с демонстрационными данными, в отдельной панели для документации.
+
 ## What's new
 
 - Dashboard card import now retains the original source configuration and displays a static analysis of images, entities and text. Reopen conversion settings without losing the source.
